@@ -1,0 +1,17 @@
+{
+  "name": "cloudfront-log-reader",
+  "version": "0.0.0",
+  "description": "Read CloudFront logs files stored in AWS S3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Mapbox",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "aws-sdk": "2.0.0-rc.15",
+    "underscore": "1.4.x"
+  }
+}

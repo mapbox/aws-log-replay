@@ -61,3 +61,13 @@ Reader.prototype._list = function(cb) {
         cb();
     });
 };
+
+// Preemptively prime the paths list
+Reader.prototype.prime = function(cb) {
+    var that = this;
+    this._list(function() {
+        that._fetch(function() {
+            cb();
+        });
+    });
+};

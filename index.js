@@ -12,6 +12,7 @@ function Reader(options) {
     this.prefix = options.prefix;
     this.paths = [];
     this.logs = [];
+    this.fetching = false;
     return this;
 }
 
@@ -22,11 +23,15 @@ Reader.prototype.read = function(cb) {
         called = true;
         cb(null, this.paths.shift());
     }
-    if (this.paths.length < 10000) {
+    // keep at least 10000 paths in the queue
+    if (this.paths.length < 10000 && !this.fetching) {
+        this.fetching = true;
         this._fetch(function() {
-            if (!called) cb(null, that.paths.shift());
+            if (!called) return cb(null, that.paths.shift());
         });
     }
+
+    if (!this.paths.length) return this._wait(cb);
 };
 
 Reader.prototype._fetch = function(cb) {
@@ -43,9 +48,10 @@ Reader.prototype._fetch = function(cb) {
                 lines.forEach(function(line) {
                     var parts = line.split(/\s+/g);
                     if (parts.length > 7) {
-                        that.paths.push(util.format('%s "%s"', parts[5], parts[7]));
+                        that.paths.push(parts[7]);
                     }
                 });
+                this.fetching = false;
                 cb();
             });
         });
@@ -62,12 +68,19 @@ Reader.prototype._list = function(cb) {
     });
 };
 
-// Preemptively prime the paths list
-Reader.prototype.prime = function(cb) {
+Reader.prototype._wait = function(cb) {
     var that = this;
-    this._list(function() {
-        that._fetch(function() {
-            cb();
-        });
-    });
+    var wait = function() {
+        if (that.paths.length) return cb(null, that.paths.shift());
+        else {
+            setTimeout(function() {
+                wait();
+            }, 100);
+        }
+    };
+
+    if (this.paths.length) return cb(null, this.paths.shift());
+    else {
+        wait();
+    }
 };

@@ -38,7 +38,7 @@ Reader.prototype._fetch = function(cb) {
     var that = this;
     this._list(function() {
         if (!that.logs.length) return;
-        s3.getObject({Bucket: that.bucket, Key: that.logs.pop()}, function(err, data) {
+        s3.getObject({Bucket: that.bucket, Key: that.logs[that.logs.length * Math.random() | 0]}, function(err, data) {
             if (err) throw err;
             zlib.gunzip(data.Body, function(err, buf) {
                 if (err) throw err;

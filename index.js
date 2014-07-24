@@ -22,13 +22,13 @@ Reader.prototype.read = function(cb) {
     var that = this;
     if (this.paths.length) {
         called = true;
-        cb(null, this.paths.shift());
+        cb(null, this.getPath());
     }
     // keep at least 10000 paths in the queue
     if (this.paths.length < 10000 && !this.fetching) {
         this.fetching = true;
         this._fetch(function() {
-            if (!called) return cb(null, that.paths.shift());
+            if (!called) return cb(null, that.getPath());
         });
     }
 
@@ -74,10 +74,19 @@ Reader.prototype._list = function(cb) {
     });
 };
 
+Reader.prototype.getPath = function() {
+    if (this.paths.length > 50000) {
+        // Don't let it get too big
+        this.paths = this.paths.splice(Math.ceil(this.paths.length / 2));
+        return this.paths.shift();
+    }
+    else return this.paths[this.paths.length * Math.random() | 0];
+};
+
 Reader.prototype._wait = function(cb) {
     var that = this;
     var wait = function() {
-        if (that.paths.length) return cb(null, that.paths.shift());
+        if (that.paths.length) return cb(null, that.getPath());
         else {
             setTimeout(function() {
                 wait();
@@ -85,7 +94,7 @@ Reader.prototype._wait = function(cb) {
         }
     };
 
-    if (this.paths.length) return cb(null, this.paths.shift());
+    if (this.paths.length) return cb(null, this.getPath());
     else {
         wait();
     }

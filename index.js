@@ -51,7 +51,11 @@ Reader.prototype._fetch = function(cb) {
                     if (parts.length > 7) {
                         // pattern - only push matches
                         if (that.pattern) {
-                            if (parts[7].match(that.pattern)) that.paths.push(parts[7]);
+                            if (parts[7].match(that.pattern)) {
+                                // add query string if it exists
+                                if (parts[11] !== "-") that.paths.push(parts[7] + "?" + parts[11]);
+                                else that.paths.push(parts[7]);
+                            }
                         }
                         // no pattern - push everything.
                         else that.paths.push(parts[7]);

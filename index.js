@@ -58,7 +58,10 @@ Reader.prototype._fetch = function(cb) {
                             }
                         }
                         // no pattern - push everything.
-                        else that.paths.push(parts[7]);
+                        else {
+                            if (parts[11] !== "-") that.paths.push(parts[7] + "?" + parts[11]);
+                            else that.paths.push(parts[7]);
+                        }
                     }
                 });
                 this.fetching = false;

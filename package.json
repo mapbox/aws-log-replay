@@ -12,6 +12,7 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "aws-sdk": "2.0.0-rc.15",
+    "sphericalmercator": "^1.0.3",
     "underscore": "1.4.x"
   }
 }

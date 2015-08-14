@@ -1,9 +1,11 @@
 var AWS = require('aws-sdk'),
     _ = require('underscore'),
     zlib = require('zlib'),
+    spherical_mercator = require('sphericalmercator'),
     util = require('util');
 
 var s3 = new AWS.S3();
+var merc = new spherical_mercator({size:256});
 
 module.exports = Reader;
 
@@ -14,6 +16,7 @@ function Reader(options) {
     this.paths = [];
     this.logs = [];
     this.fetching = false;
+    this.bbox = options.bbox;
     return this;
 }
 
@@ -27,8 +30,7 @@ Reader.prototype.read = function(cb) {
     // keep at least 10000 paths in the queue
     if (this.paths.length < 10000 && !this.fetching) {
         this.fetching = true;
-        this._fetch(function() {
-            if (!called) return cb(null, that.getPath());
+        this._fetch(function() { if (!called) return cb(null, that.getPath());
         });
     }
 
@@ -45,24 +47,36 @@ Reader.prototype._fetch = function(cb) {
                 if (err) throw err;
                 var lines = buf.toString();
                 // slice removes two header lines
-                lines = lines.split('\n').slice(2);
-                lines.forEach(function(line) {
+                that.paths = lines.split('\n').slice(2);
+                // filter by given pattern or bbox
+                that.paths = that.paths.filter(function(line) {
                     var parts = line.split(/\s+/g);
-                    if (parts.length > 7) {
-                        // pattern - only push matches
-                        if (that.pattern) {
-                            if (parts[7].match(that.pattern)) {
-                                // add query string if it exists
-                                if (parts[11] !== "-") that.paths.push(parts[7] + "?" + parts[11]);
-                                else that.paths.push(parts[7]);
-                            }
-                        }
-                        // no pattern - push everything.
-                        else {
-                            if (parts[11] !== "-") that.paths.push(parts[7] + "?" + parts[11]);
-                            else that.paths.push(parts[7]);
-                        }
+                    if (that.pattern && parts.length > 7 && parts[7].match(that.pattern)) {
+                        return true;
+                    } else return false;
+                }).filter(function(line) {
+                    if (that.bbox) {
+                        var parts = line.split(/\s+/g);
+                        if (parts.length > 6) {
+                            var tileRequest = parts[7].split('/');
+                            if (tileRequest.slice(-1)[0].indexOf('.png') !== -1) {
+                                var reqtile = tileRequest.slice(-3).map(function clean(x){return parseInt(x)});
+                                reqtile.push(reqtile.shift());
+                                // convert requested tile into geometry and compare against given bbox
+                                var reqbbox = merc.bbox(+reqtile[0],+reqtile[1],+reqtile[2]);
+                                if (reqbbox[0] >= that.bbox[0] && reqbbox[0] <= that.bbox[2] && reqbbox[2] <= that.bbox[2]) {
+                                    return true;
+                                }
+                            } else return false;
+                        } else return false;
                     }
+                });
+                // only keep paths
+                that.paths = that.paths.map(function(line){
+                    var parts = line.split(/\s+/g);
+                    if (parts[11] !== "-") {
+                        return line.split(/\s+/g)[7] + "?" + parts[11];
+                    } else return line.split(/\s+/g)[7];
                 });
                 this.fetching = false;
                 cb();

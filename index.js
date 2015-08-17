@@ -71,13 +71,15 @@ Reader.prototype._fetch = function(cb) {
                         } else return false;
                     }
                 });
-                // only keep paths
+                // .filter keeps entire log lines. Parse out paths from every line.
                 that.paths = that.paths.map(function(line){
                     var parts = line.split(/\s+/g);
                     var mapid = parts[7].split('/')[2];
                     var mapquest = "mapquest.streets";
                     if (parts[11] !== "-") {
-                        return parts[7].split(mapid).join(mapquest) + "?" + parts[11];
+                        var mqpubkey = "=pk.eyJ1IjoibWFwYm94IiwiYSI6ImdQMzI4WjgifQ.d-Uyr7NBjrJVz9z82uk5Xg"
+                        var token = parts[11].replace(/(\=.*)$/, mqpubkey);
+                        return parts[7].split(mapid).join(mapquest) + "?" + token;
                     } else return parts[7].split(mapid).join(mapquest);
                 });
                 this.fetching = false;

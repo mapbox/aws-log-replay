@@ -64,7 +64,7 @@ Reader.prototype._fetch = function(cb) {
                                 reqtile.push(reqtile.shift());
                                 // convert requested tile into geometry and compare against given bbox
                                 var reqbbox = merc.bbox(+reqtile[0],+reqtile[1],+reqtile[2]);
-                                if (reqbbox[0] >= that.bbox[0] && reqbbox[0] <= that.bbox[2] && reqbbox[2] <= that.bbox[2]) {
+                                if (reqbbox[0] >= that.bbox[0] && reqbbox[2] <= that.bbox[2] && reqbbox[1] >= that.bbox[1] && reqbbox[3] <= that.bbox[3]) {
                                     return true;
                                 }
                             } else return false;
@@ -74,9 +74,11 @@ Reader.prototype._fetch = function(cb) {
                 // only keep paths
                 that.paths = that.paths.map(function(line){
                     var parts = line.split(/\s+/g);
+                    var mapid = parts[7].split('/')[2];
+                    var mapquest = "mapquest.streets";
                     if (parts[11] !== "-") {
-                        return line.split(/\s+/g)[7] + "?" + parts[11];
-                    } else return line.split(/\s+/g)[7];
+                        return parts[7].split(mapid).join(mapquest) + "?" + parts[11];
+                    } else return parts[7].split(mapid).join(mapquest);
                 });
                 this.fetching = false;
                 cb();

@@ -72,16 +72,13 @@ Reader.prototype._fetch = function(cb) {
                     }
                 });
                 // .filter keeps entire log lines. Parse out paths from every line.
+                // make everything a v4 request
                 that.paths = that.paths.map(function(line){
                     var parts = line.split(/\s+/g);
-                    var mapid = parts[7].split('/')[2];
-                    var mapquest = "mapquest.streets";
-                    if (parts[11] !== "-") {
-                        var mqpubkey = "=pk.eyJ1IjoibWFwYm94IiwiYSI6ImdQMzI4WjgifQ.d-Uyr7NBjrJVz9z82uk5Xg"
-                        var token = parts[11].replace(/(\=.*)$/, mqpubkey);
-                        return parts[7].split(mapid).join(mapquest) + "?" + token;
-                    } else return parts[7].split(mapid).join(mapquest);
+                    var reqtile = parts[7].split('/').splice(-3).join('/');
+                    return '/v4/mapquest.streets/' + reqtile + '?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImdQMzI4WjgifQ.d-Uyr7NBjrJVz9z82uk5Xg';
                 });
+console.log(that.paths);
                 this.fetching = false;
                 cb();
             });

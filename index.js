@@ -16,7 +16,7 @@ function Reader(options) {
     this.paths = [];
     this.logs = [];
     this.fetching = false;
-    this.bbox = options.bbox;
+    this.limitbbox = options.limitbbox;
     return this;
 }
 
@@ -48,14 +48,14 @@ Reader.prototype._fetch = function(cb) {
                 var lines = buf.toString();
                 // slice removes two header lines
                 that.paths = lines.split('\n').slice(2);
-                // filter by given pattern or bbox
+                // filter by given pattern or limiting bbox
                 that.paths = that.paths.filter(function(line) {
                     var parts = line.split(/\s+/g);
                     if (that.pattern && parts.length > 7 && parts[7].match(that.pattern)) {
                         return true;
                     } else return false;
                 }).filter(function(line) {
-                    if (that.bbox) {
+                    if (that.limitbbox) {
                         var parts = line.split(/\s+/g);
                         if (parts.length > 6) {
                             var tileRequest = parts[7].split('/');
@@ -64,7 +64,7 @@ Reader.prototype._fetch = function(cb) {
                                 reqtile.push(reqtile.shift());
                                 // convert requested tile into geometry and compare against given bbox
                                 var reqbbox = merc.bbox(+reqtile[0],+reqtile[1],+reqtile[2]);
-                                if (reqbbox[0] >= that.bbox[0] && reqbbox[2] <= that.bbox[2] && reqbbox[1] >= that.bbox[1] && reqbbox[3] <= that.bbox[3]) {
+                                if (reqbbox[0] >= that.limitbbox[0] && reqbbox[2] <= that.limitbbox[2] && reqbbox[1] >= that.limitbbox[1] && reqbbox[3] <= that.limitbbox[3]) {
                                     return true;
                                 }
                             } else return false;

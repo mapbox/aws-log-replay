@@ -76,9 +76,8 @@ Reader.prototype._fetch = function(cb) {
                 that.paths = that.paths.map(function(line){
                     var parts = line.split(/\s+/g);
                     var reqtile = parts[7].split('/').splice(-3).join('/');
-                    return '/v4/mapquest.streets/' + reqtile + '?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImdQMzI4WjgifQ.d-Uyr7NBjrJVz9z82uk5Xg';
+                    return '/v4/mapquest.streets/' + reqtile + '?access_token=pk.eyJ1IjoibWFwcXVlc3QiLCJhIjoiY2Q2N2RlMmNhY2NiZTRkMzlmZjJmZDk0NWU0ZGJlNTMifQ.mPRiEubbajc6a5y9ISgydg';
                 });
-console.log(that.paths);
                 this.fetching = false;
                 cb();
             });

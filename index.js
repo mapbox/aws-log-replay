@@ -28,7 +28,7 @@ Reader.prototype.read = function(cb) {
         cb(null, this.getPath());
     }
     // keep at least 10000 paths in the queue
-    if (this.paths.length < 10000 && !this.fetching) {
+    if (this.paths.length <= 50000 && !this.fetching) {
         this.fetching = true;
         this._fetch(function() { if (!called) return cb(null, that.getPath());
         });
@@ -78,7 +78,7 @@ Reader.prototype._fetch = function(cb) {
                     var reqtile = parts[7].split('/').splice(-3).join('/');
                     return '/v4/mapquest.streets/' + reqtile + '?access_token=pk.eyJ1IjoibWFwcXVlc3QiLCJhIjoiY2Q2N2RlMmNhY2NiZTRkMzlmZjJmZDk0NWU0ZGJlNTMifQ.mPRiEubbajc6a5y9ISgydg';
                 });
-                this.fetching = false;
+                that.fetching = false;
                 cb();
             });
         });
@@ -88,20 +88,33 @@ Reader.prototype._fetch = function(cb) {
 Reader.prototype._list = function(cb) {
     if (this.logs.length) return cb();
     var that = this;
-    s3.listObjects({Bucket: this.bucket, Prefix: this.prefix}, function(err, data) {
-        if (err) throw err;
-        that.logs = _(data.Contents).pluck('Key');
-        cb();
-    });
+    var params = {
+        Bucket: this.bucket,
+        Prefix: this.prefix,
+        Delimiter: ',',
+    };
+    var list = function(Marker) {
+        if (Marker) params.Marker = Marker;
+        s3.listObjects(params, function(err, data) {
+            if (err) throw err;
+            that.logs = that.logs.concat(_(data.Contents).pluck('Key'));
+            if (data.NextMarker) {
+                list(data.NextMarker);
+            } else {
+                cb();
+            }
+        });
+    };
+    list();
 };
 
 Reader.prototype.getPath = function() {
-    if (this.paths.length > 50000) {
-        // Don't let it get too big
-        this.paths = this.paths.splice(Math.ceil(this.paths.length / 2));
+    // Avoid running out of paths
+    if (this.paths.length == 1) {
+        return this.paths[0];
+    } else {
         return this.paths.shift();
     }
-    else return this.paths[this.paths.length * Math.random() | 0];
 };
 
 Reader.prototype._wait = function(cb) {

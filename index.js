@@ -74,11 +74,24 @@ Reader.prototype._fetch = function(cb) {
 Reader.prototype._list = function(cb) {
     if (this.logs.length) return cb();
     var that = this;
-    s3.listObjects({Bucket: this.bucket, Prefix: this.prefix}, function(err, data) {
-        if (err) throw err;
-        that.logs = _(data.Contents).pluck('Key');
-        cb();
-    });
+    var params = {
+        Bucket: this.bucket,
+        Prefix: this.prefix,
+        Delimiter: ',',
+    };
+    var list = function(Marker) {
+        if (Marker) params.Marker = Marker;
+        s3.listObjects(params, function(err, data) {
+            if (err) throw err;
+            that.logs = that.logs.concat(_(data.Contents).pluck('Key'));
+            if (data.NextMarker) {
+                list(data.NextMarker);
+            } else {
+                cb();
+            }
+        });
+    };
+    list();
 };
 
 Reader.prototype.getPath = function() {

@@ -25,7 +25,7 @@ Reader.prototype.read = function(cb) {
         cb(null, this.getPath());
     }
     // keep at least 10000 paths in the queue
-    if (this.paths.length < 10000 && !this.fetching) {
+    if (this.paths.length <= 50000 && !this.fetching) {
         this.fetching = true;
         this._fetch(function() {
             if (!called) return cb(null, that.getPath());
@@ -64,7 +64,7 @@ Reader.prototype._fetch = function(cb) {
                         }
                     }
                 });
-                this.fetching = false;
+                that.fetching = false;
                 cb();
             });
         });
@@ -95,12 +95,12 @@ Reader.prototype._list = function(cb) {
 };
 
 Reader.prototype.getPath = function() {
-    if (this.paths.length > 50000) {
-        // Don't let it get too big
-        this.paths = this.paths.splice(Math.ceil(this.paths.length / 2));
+    // Avoid running out of paths
+    if (this.paths.length == 1) {
+        return this.paths[0];
+    } else {
         return this.paths.shift();
     }
-    else return this.paths[this.paths.length * Math.random() | 0];
 };
 
 Reader.prototype._wait = function(cb) {

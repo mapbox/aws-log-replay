@@ -16,5 +16,8 @@
     "queue-async": "1.0.x",
     "split": "1.0.x",
     "tape": "3.5.x"
+  },
+  "scripts": {
+    "test": "tape test/*.test.js"
   }
 }

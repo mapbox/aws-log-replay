@@ -1,0 +1,13 @@
+{
+  "name": "cloudfront-log-reader",
+  "version": "0.4.0",
+  "description": "Read CloudFront logs files stored in AWS S3",
+  "main": "index.js",
+  "repository": "",
+  "author": "Mapbox",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "s3scan": "0.1.x"
+  }
+}

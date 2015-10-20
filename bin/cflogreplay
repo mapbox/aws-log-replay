@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var keepalive = require('agentkeepalive');
+var agent = new keepalive.HttpsAgent({
+  keepAlive: true,
+  maxSockets: Math.ceil(require('os').cpus().length * 16),
+  keepAliveTimeout: 60000
+});
+var split = require('split');
+var reader = require('..');
+
+var baseurl = process.argv[2];
+if (!baseurl) {
+  console.error('Usage: cflogreplay <baseurl>');
+  process.exit(1);
+}
+
+var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent });
+process.stdin
+    .pipe(split())
+    .pipe(reqStream)
+    .on('data', function(data) {
+        console.log(data.Body.toString('utf8'));
+    });
+

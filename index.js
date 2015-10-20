@@ -12,6 +12,12 @@ module.exports.ScanGunzip = ScanGunzip;
 module.exports.RequestStream = RequestStream;
 module.exports.getPath = getPath;
 
+/**
+ * Create a readable line-oriented stream of CF logs.
+ * @param {string} uri - An s3 url with prefix to CF logs. Example: 's3://mybucket/cf-logs/'
+ * @param {object} options
+ * @param {object} options.agent - Optional. An http agent to use when requesting logs
+ */
 function LogStream(uri, options) {
     options = options || {};
 
@@ -25,6 +31,10 @@ function LogStream(uri, options) {
     return scanGunzip;
 }
 
+/**
+ * Transform stream for converting gzipped CF logs from an s3scan Scan stream
+ * to line log text.
+ */
 function ScanGunzip() {
     var scanGunzip = new stream.Transform({ objectMode: true });
     scanGunzip._transform = function(data, enc, callback) {
@@ -37,6 +47,12 @@ function ScanGunzip() {
     return scanGunzip;
 }
 
+/**
+ * Transform stream for replaying requests from a CF log against a specified
+ * host. LH side expects a line-oriented stream of CF log lines.
+ * @param {object} options
+ * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
+ */
 function RequestStream(options) {
     options = options || {};
     if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
@@ -89,6 +105,10 @@ function RequestStream(options) {
     return requestStream;
 }
 
+/**
+ * Convert a CF log line into a path and querystring.
+ * @param {string} line
+ */
 function getPath(line) {
     var parts = line.split(/\s+/g);
     if (parts.length > 7) {

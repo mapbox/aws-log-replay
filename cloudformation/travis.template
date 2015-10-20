@@ -1,0 +1,70 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Travis test user for cloudfront-log-reader",
+    "Resources": {
+        "TestUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Path": "/service/",
+                "Policies": [
+                    {
+                        "PolicyName": "test",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox"
+                                    ],
+                                    "Action": [
+                                        "s3:ListBucket"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Condition": {
+                                        "StringLike": {
+                                            "s3:prefix": "cloudfront-log-reader/*"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox/cloudfront-log-reader/*"
+                                    ],
+                                    "Action": [
+                                        "s3:DeleteObject",
+                                        "s3:GetObject",
+                                        "s3:PutObject",
+                                        "s3:PutObjectAcl"
+                                    ],
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "TestKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "TestUser"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "TestAccessKeyId": {
+            "Value": {
+                "Ref": "TestKey"
+            }
+        },
+        "TestSecretAccessKey": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "TestKey",
+                    "SecretAccessKey"
+                ]
+            }
+        }
+    }
+}

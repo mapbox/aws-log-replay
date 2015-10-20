@@ -80,17 +80,18 @@ function RequestStream(options) {
             return setImmediate(requestStream._transform.bind(requestStream), line, enc, callback);
         }
 
+        var requrl = options.baseurl + url.format(uri);
         requestStream.pending++;
         requestStream.queue.defer(function(next) {
             request({
                 agent: options.agent,
                 encoding: null,
-                uri: options.baseurl + url.format(uri),
+                uri: requrl
             }, function(err, res, body) {
                 requestStream.pending--;
-                if (err) return requestStream.emit('error');
+                if (err) return requestStream.emit('error', err);
                 if (res.statusCode !== 200) return next();
-                requestStream.push({ Body: body });
+                requestStream.push({ url: requrl, body: body });
                 requestStream.got++;
                 next();
             });

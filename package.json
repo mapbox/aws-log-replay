@@ -8,13 +8,13 @@
   "license": "BSD",
   "readmeFilename": "README.md",
   "dependencies": {
+    "requestretry": "1.5.x",
     "s3scan": "0.1.x",
     "split": "1.0.x"
   },
   "devDependencies": {
     "aws-sdk": "2.2.x",
     "queue-async": "1.0.x",
-    "split": "1.0.x",
     "tape": "3.5.x"
   },
   "scripts": {

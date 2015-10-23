@@ -21,7 +21,7 @@ module.exports.getPath = getPath;
 function LogStream(uri, options) {
     options = options || {};
 
-    var s3scanOpts = { agent: options.agent };
+    var s3scanOpts = { agent: options.agent, highWaterMark: 128 };
     var scanGunzip = ScanGunzip();
     var scan = s3scan.Scan(uri, s3scanOpts)
         .on('error', function(err) {
@@ -36,7 +36,7 @@ function LogStream(uri, options) {
  * to line log text.
  */
 function ScanGunzip() {
-    var scanGunzip = new stream.Transform({ objectMode: true });
+    var scanGunzip = new stream.Transform({ objectMode: true, highWaterMark: 8 });
     scanGunzip._transform = function(data, enc, callback) {
         zlib.gunzip(data.Body, function(err, body) {
             if (err) return callback(err);

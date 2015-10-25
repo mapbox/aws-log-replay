@@ -112,7 +112,7 @@ function RequestStream(options) {
  */
 function getPath(line) {
     var parts = line.split(/\s+/g);
-    if (parts.length > 7) {
+    if (parts.length > 7 && parts[7][0] === '/') {
         if (parts[11] && parts[11] !== "-") {
             return parts[7] + "?" + parts[11];
         } else {

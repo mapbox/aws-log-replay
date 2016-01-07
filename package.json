@@ -21,7 +21,8 @@
   },
   "bin": {
     "cflogreader": "./bin/cflogreader",
-    "cflogreplay": "./bin/cflogreplay"
+    "cflogreplay": "./bin/cflogreplay",
+    "generatepath": "./bin/generatepath"
   },
   "scripts": {
     "doc": "documentation -f md > api.md",

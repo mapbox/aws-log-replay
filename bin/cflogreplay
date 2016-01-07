@@ -17,9 +17,11 @@ var agent = new agentType({
     keepAliveTimeout: 60000
 });
 
+var generatePath = reader.GeneratePath('cloudfront');
 var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent });
 process.stdin
     .pipe(split())
+    .pipe(generatePath)
     .pipe(reqStream)
     .on('error', function(err) {
         console.error(err);

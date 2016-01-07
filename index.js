@@ -90,7 +90,7 @@ function RequestStream(options) {
 
     requestStream._transform = function(pathname, enc, callback) {
         if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
-        if (!pathname) return callback();
+        if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
         var uri = url.parse(pathname, true);
 

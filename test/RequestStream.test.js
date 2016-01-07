@@ -26,6 +26,7 @@ tape('RequestStream', function(assert) {
         assert.deepEqual(/http:\/\/localhost:9999\/(a|b)\.json/.test(d.url), true, 'data.url is object url');
         assert.deepEqual(Buffer.isBuffer(d.body), true, 'data.body is buffer');
         data.push(JSON.parse(d.body));
+        console.log(JSON.parse(d.body))
     });
     reqstream.on('end', function() {
         assert.deepEqual(data.length, 2, 'emits 2 objects');
@@ -35,7 +36,7 @@ tape('RequestStream', function(assert) {
     reqstream.write('/a.json?option=1\n');
     reqstream.write('/b.json?option=2\n');
     reqstream.write('/c.json?option=2\n');
-    //reqstream.write('\n');
+    reqstream.write('\n');
     reqstream.end();
 });
 

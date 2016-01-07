@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+var keepalive = require('agentkeepalive');
+var split = require('split');
+var reader = require('..');
+
+var type = process.argv[2];
+if (!type || type !== 'cloudfront') {
+  console.error('Usage: generatepath <type>');
+  console.error('<type> can be "cloudfront"');
+  process.exit(1);
+}
+
+var generatePath = reader.GeneratePath(type);
+process.stdin
+    .pipe(split())
+    .pipe(generatePath)
+    .on('error', function(err) {
+        console.error(err);
+        process.exit(1);
+    })
+    .on('data', function(data) {
+        console.log(data.toString('utf8'));
+    });

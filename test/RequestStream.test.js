@@ -32,10 +32,10 @@ tape('RequestStream', function(assert) {
         assert.deepEqual(data.map(function(d) { return d.obj }).sort(), ['a', 'b'], 'emits objects a, b');
         assert.end();
     });
-    reqstream.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/a.json	200	https://www.mapbox.com/	FakeAgent	option=1	-	Miss	FAKE==	example.com	http	784	0.314\n');
-    reqstream.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/b.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
-    reqstream.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/c.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
-    reqstream.write('\n');
+    reqstream.write('/a.json?option=1\n');
+    reqstream.write('/b.json?option=2\n');
+    reqstream.write('/c.json?option=2\n');
+    //reqstream.write('\n');
     reqstream.end();
 });
 

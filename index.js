@@ -10,7 +10,7 @@ module.exports = {};
 module.exports.LogStream = LogStream;
 module.exports.ScanGunzip = ScanGunzip;
 module.exports.RequestStream = RequestStream;
-module.exports.getPath = getPath;
+module.exports.CfPath = CfPath;
 
 /**
  * Create a readable line-oriented stream of CF logs.
@@ -48,8 +48,29 @@ function ScanGunzip() {
 }
 
 /**
- * Transform stream for replaying requests from a CF log against a specified
- * host. LH side expects a line-oriented stream of CF log lines.
+ * Transform stream for converting a CF log line into a path and querystring.
+ * Expects a line-oriented stream of CF log lines.
+ */
+function CfPath() {
+    var cfPath = new stream.Transform({ objectMode: true });
+    cfPath._transform = function(line, enc, callback) {
+        if (!line) return callback();
+        var parts = line.split(/\s+/g);
+        if (parts.length > 7) {
+            if (parts[11] && parts[11] !== "-") {
+                cfPath.push(parts[7] + "?" + parts[11]);
+            } else {
+                cfPath.push(parts[7]);
+            }
+        }
+        callback();
+    };
+    return cfPath;
+}
+
+/**
+ * Transform stream for replaying requests from a log of paths against a specified
+ * host. LH side expects a line-oriented stream of paths (& querystrings).
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
  */
@@ -67,11 +88,8 @@ function RequestStream(options) {
         if (err) requestStream.emit('error', err);
     });
 
-    requestStream._transform = function(line, enc, callback) {
-        if (typeof line !== 'string') line = line.toString('utf8');
-
-        var pathname = getPath(line);
-
+    requestStream._transform = function(pathname, enc, callback) {
+        if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
         if (!pathname) return callback();
 
         var uri = url.parse(pathname, true);
@@ -105,19 +123,3 @@ function RequestStream(options) {
 
     return requestStream;
 }
-
-/**
- * Convert a CF log line into a path and querystring.
- * @param {string} line
- */
-function getPath(line) {
-    var parts = line.split(/\s+/g);
-    if (parts.length > 7) {
-        if (parts[11] && parts[11] !== "-") {
-            return parts[7] + "?" + parts[11];
-        } else {
-            return parts[7];
-        }
-    }
-}
-

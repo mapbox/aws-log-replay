@@ -17,9 +17,11 @@ var agent = new agentType({
     keepAliveTimeout: 60000
 });
 
+var cfPath = reader.CfPath();
 var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent });
 process.stdin
     .pipe(split())
+    .pipe(cfPath)
     .pipe(reqStream)
     .on('error', function(err) {
         console.error(err);

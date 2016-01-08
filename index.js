@@ -98,7 +98,7 @@ function RequestStream(options) {
         var uri = url.parse(pathname, true);
 
         if (requestStream.pending > 1000) {
-            return setImmediate(requestStream._transform.bind(requestStream), line, enc, callback);
+            return setImmediate(requestStream._transform.bind(requestStream), pathname, enc, callback);
         }
 
         var requrl = options.baseurl + url.format(uri);

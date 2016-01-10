@@ -9,6 +9,7 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "agentkeepalive": "^2.0.3",
+    "minimist": "^1.2.0",
     "queue-async": "1.0.x",
     "requestretry": "1.5.x",
     "s3scan": "0.1.x",

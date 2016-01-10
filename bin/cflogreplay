@@ -3,14 +3,15 @@
 var keepalive = require('agentkeepalive');
 var split = require('split');
 var reader = require('..');
+var args = require('minimist')(process.argv.slice(2));
 
-var baseurl = process.argv[2];
-if (!baseurl) {
-  console.error('Usage: cflogreplay <baseurl>');
+var baseurl = args._[0];
+if (!baseurl || baseurl.indexOf('http') == -1) {
+  console.error('Usage: cflogreplay <baseurl> [--concurrency=<n>]');
   process.exit(1);
 }
 
-var hwm = parseInt(process.argv[3]) ? parseInt(process.argv[3]) : null;
+var hwm = parseInt(args.concurrency) ? parseInt(args.concurrency) : null;
 
 var agentType = /http:/.test(baseurl)? keepalive : keepalive.HttpsAgent;
 var agent = new agentType({

@@ -20,9 +20,9 @@ Usage: cflogreader <s3url>
 
 ### cflogreplay
 
-Makes replay requests to the `baseurl`. Expects CF log lines to be piped to `stdin`.
+Makes replay requests to the `baseurl`. Expects CF log lines to be piped to `stdin`. (Optional) Control concurrency of replay requests with `--concurrency` flag. Default is 100.
 
 ```sh
-Usage: cflogreplay <baseurl>
+Usage: cflogreplay <baseurl> [--concurrency=<n>]
 ```
 

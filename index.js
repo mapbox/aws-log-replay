@@ -89,13 +89,14 @@ function GeneratePath(type) {
 function RequestStream(options) {
     options = options || {};
     if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
+    if (!options.hwm) options.hwm = 100;
 
     var starttime = Date.now();
     var requestStream = new stream.Transform(options);
     requestStream._readableState.objectMode = true;
     requestStream.got = 0;
     requestStream.pending = 0;
-    requestStream.queue = queue();
+    requestStream.queue = queue(options.hwm);
     requestStream.queue.awaitAll(function(err) {
         if (err) requestStream.emit('error', err);
     });
@@ -106,7 +107,7 @@ function RequestStream(options) {
 
         var uri = url.parse(pathname, true);
 
-        if (requestStream.pending > 1000) {
+        if (requestStream.pending > (options.hwm * 1.5)) {
             return setImmediate(requestStream._transform.bind(requestStream), pathname, enc, callback);
         }
 

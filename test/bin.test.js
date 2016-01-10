@@ -23,7 +23,7 @@ tape('setup', function(assert) {
 tape('cflogreplay: usage', function(assert) {
     exec(__dirname + '/../bin/cflogreplay', {env:process.env}, function(err, stdout, stderr) {
         assert.equal(err.code, 1, 'exits 1');
-        assert.equal(stderr, 'Usage: cflogreplay <baseurl>\n', 'shows usage');
+        assert.equal(stderr, 'Usage: cflogreplay <baseurl> [--concurrency=<n>]\n', 'shows usage');
         assert.end();
     });
 });
@@ -45,6 +45,34 @@ tape('cflogreplay', function(assert) {
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/a.json	200	https://www.mapbox.com/	FakeAgent	option=1	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/b.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/c.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
+    child.stdin.write('\n');
+    child.stdin.end();
+});
+
+tape('cflogreplay [bad args]', function(assert) {
+    var child = spawn(__dirname + '/../bin/cflogreplay', ['foobar', 'http://localhost:9999']);
+    var data = [];
+    child.stderr.on('data', function(data) {
+        assert.equal(data.toString(), 'Usage: cflogreplay <baseurl> [--concurrency=<n>]\n', 'Usage when args out of order');
+        assert.end();
+    });
+});
+
+tape('cflogreplay [concurrency arg]', function(assert) {
+    var child = spawn(__dirname + '/../bin/cflogreplay', ['http://localhost:9999', '--concurrency=5']);
+    var data = [];
+    child.stdout.on('data', function(d) {
+        data.push(d.toString());
+    });
+    child.stderr.on('data', function(data) {
+        assert.ifError(data);
+    });
+    child.on('close', function(code) {
+        assert.deepEqual(data, ['{"obj":"a"}\n'], 'emits obj a');
+        assert.equal(code, 0, 'exits 0');
+        assert.end();
+    });
+    child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/a.json	200	https://www.mapbox.com/	FakeAgent	option=1	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('\n');
     child.stdin.end();
 });

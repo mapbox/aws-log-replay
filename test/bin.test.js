@@ -29,7 +29,7 @@ tape('cflogreplay: usage', function(assert) {
 });
 
 tape('cflogreplay', function(assert) {
-    var child = spawn(__dirname + '/../bin/cflogreplay', ['http://localhost:9999']);
+    var child = spawn(__dirname + '/../bin/cflogreplay', ['http://localhost:9999', 'foobar']);
     var data = [];
     child.stdout.on('data', function(d) {
         data.push(d.toString());

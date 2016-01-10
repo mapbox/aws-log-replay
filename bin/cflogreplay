@@ -10,6 +10,8 @@ if (!baseurl) {
   process.exit(1);
 }
 
+var hwm = parseInt(process.argv[3]) ? parseInt(process.argv[3]) : null;
+
 var agentType = /http:/.test(baseurl)? keepalive : keepalive.HttpsAgent;
 var agent = new agentType({
     keepAlive: true,
@@ -18,7 +20,7 @@ var agent = new agentType({
 });
 
 var generatePath = reader.GeneratePath('cloudfront');
-var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent });
+var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent, hwm: hwm });
 process.stdin
     .pipe(split())
     .pipe(generatePath)

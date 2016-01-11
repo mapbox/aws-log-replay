@@ -77,6 +77,63 @@ tape('cflogreplay [concurrency arg]', function(assert) {
     child.stdin.end();
 });
 
+tape('pathreplay: usage', function(assert) {
+    exec(__dirname + '/../bin/pathreplay', {env:process.env}, function(err, stdout, stderr) {
+        assert.equal(err.code, 1, 'exits 1');
+        assert.equal(stderr, 'Usage: pathreplay <baseurl> [--concurrency=<n>]\n', 'shows usage');
+        assert.end();
+    });
+});
+
+tape('pathreplay', function(assert) {
+    var child = spawn(__dirname + '/../bin/pathreplay', ['http://localhost:9999']);
+    var data = [];
+    child.stdout.on('data', function(d) {
+        data.push(d.toString());
+    });
+    child.stderr.on('data', function(data) {
+        assert.ifError(data);
+    });
+    child.on('close', function(code) {
+        assert.deepEqual(data, ['{"obj":"a"}\n', '{"obj":"b"}\n'], 'emits obj a, b');
+        assert.equal(code, 0, 'exits 0');
+        assert.end();
+    });
+    child.stdin.write('/a.json\n');
+    child.stdin.write('/b.json\n');
+    child.stdin.write('/c.json\n');
+    child.stdin.write('\n');
+    child.stdin.end();
+});
+
+tape('pathreplay [bad args]', function(assert) {
+    var child = spawn(__dirname + '/../bin/pathreplay', ['foobar', 'http://localhost:9999']);
+    var data = [];
+    child.stderr.on('data', function(data) {
+        assert.equal(data.toString(), 'Usage: pathreplay <baseurl> [--concurrency=<n>]\n', 'Usage when args out of order');
+        assert.end();
+    });
+});
+
+tape('pathreplay [concurrency arg]', function(assert) {
+    var child = spawn(__dirname + '/../bin/pathreplay', ['http://localhost:9999', '--concurrency=5']);
+    var data = [];
+    child.stdout.on('data', function(d) {
+        data.push(d.toString());
+    });
+    child.stderr.on('data', function(data) {
+        assert.ifError(data);
+    });
+    child.on('close', function(code) {
+        assert.deepEqual(data, ['{"obj":"a"}\n'], 'emits obj a');
+        assert.equal(code, 0, 'exits 0');
+        assert.end();
+    });
+    child.stdin.write('/a.json\n');
+    child.stdin.write('\n');
+    child.stdin.end();
+});
+
 tape('teardown', function(assert) {
     server.close(assert.end);
 });

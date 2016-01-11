@@ -7,7 +7,7 @@ var args = require('minimist')(process.argv.slice(2));
 
 var baseurl = args._[0];
 if (!baseurl || baseurl.indexOf('http') == -1) {
-  console.error('Usage: cflogreplay <baseurl> [--concurrency=<n>]');
+  console.error('Usage: pathreplay <baseurl> [--concurrency=<n>]');
   process.exit(1);
 }
 
@@ -20,11 +20,9 @@ var agent = new agentType({
     keepAliveTimeout: 60000
 });
 
-var generatePath = reader.GeneratePath('cloudfront');
 var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent, hwm: hwm });
 process.stdin
     .pipe(split())
-    .pipe(generatePath)
     .pipe(reqStream)
     .on('error', function(err) {
         console.error(err);

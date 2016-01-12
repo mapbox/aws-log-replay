@@ -22,7 +22,7 @@
   },
   "bin": {
     "cflogreader": "./bin/cflogreader",
-    "cflogreplay": "./bin/cflogreplay",
+    "pathreplay": "./bin/pathreplay",
     "generatepath": "./bin/generatepath"
   },
   "scripts": {

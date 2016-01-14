@@ -18,11 +18,18 @@ Streams CF log lines to `stdout`.
 Usage: cflogreader <s3url>
 ```
 
-### cflogreplay
+### generatepath
 
-Makes replay requests to the `baseurl`. Expects CF log lines to be piped to `stdin`.
+Takes different types of logs as input and streams paths to `stdout`. The only supported type is "cloudfront".
 
 ```sh
-Usage: cflogreplay <baseurl>
+Usage: generatepath <type>
 ```
 
+### pathreplay
+
+Makes replay requests to the `baseurl`. Expects paths to be piped to `stdin`. (Optional) Control concurrency of replay requests with `--concurrency` flag. Default is 100.
+
+```sh
+Usage: pathreplay <baseurl> [--concurrency=<n>]
+```

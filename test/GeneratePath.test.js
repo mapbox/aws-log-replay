@@ -17,3 +17,19 @@ tape('GeneratePath [cloudfront]', function(assert) {
     generatePath.write('\n');
     generatePath.end();
 });
+
+tape('GeneratePath [elb]', function(assert) {
+    var data = [];
+    var generatePath = reader.GeneratePath('elb');
+    generatePath.on('data', function(d) {
+        data.push(d);
+    });
+    generatePath.on('end', function() {
+        assert.equal(data[0], '/a.json?option=1');
+        assert.equal(data.length, 1);
+        assert.end();
+    });
+    generatePath.write('\n');
+    generatePath.write('\n');
+    generatePath.end();
+});

@@ -115,12 +115,12 @@ tape('cflogreader', function(assert) {
 tape('generatepath: usage', function(assert) {
     exec(__dirname + '/../bin/generatepath', {env:process.env}, function(err, stdout, stderr) {
         assert.equal(err.code, 1, 'exits 1');
-        assert.equal(stderr, 'Usage: generatepath <type>\n<type> can be "cloudfront"\n', 'shows usage');
+        assert.equal(stderr, 'Usage: generatepath <type>\n<type> can be "cloudfront" or "elb"\n', 'shows usage');
         assert.end();
     });
 });
 
-tape('generatepath', function(assert) {
+tape('generatepath [cloudfront]', function(assert) {
     var child = spawn(__dirname + '/../bin/generatepath', ['cloudfront']);
     var data = [];
     child.stdout.on('data', function(d) {
@@ -130,15 +130,34 @@ tape('generatepath', function(assert) {
         assert.ifError(data);
     });
     child.on('close', function(code) {
-        assert.equal(data[0], '/a.json?option=1\n')
-        assert.equal(data[1], '/b.json?option=2\n')
-        assert.equal(data[2], '/c.json?option=2\n')
+        assert.equal(data[0], '/a.json?option=1\n');
+        assert.equal(data[1], '/b.json?option=2\n');
+        assert.equal(data[2], '/c.json?option=2\n');
         assert.equal(code, 0, 'exits 0');
         assert.end();
     });
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/a.json	200	https://www.mapbox.com/	FakeAgent	option=1	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/b.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/c.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
+    child.stdin.write('\n');
+    child.stdin.end(); 
+});
+
+tape('generatepath [cloudfront]', function(assert) {
+    var child = spawn(__dirname + '/../bin/generatepath', ['elb']);
+    var data = [];
+    child.stdout.on('data', function(d) {
+        data.push(d.toString());
+    });
+    child.stderr.on('data', function(data) {
+        assert.ifError(data);
+    });
+    child.on('close', function(code) {
+        assert.equal(data[0], '/a.json?option=1\n');
+        assert.equal(code, 0, 'exits 0');
+        assert.end();
+    });
+    child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 304 304 0 0 "GET http://green-eggs.com:80/a.json?option=1 HTTP/1.1" "Amazon CloudFront" - -\n');
     child.stdin.write('\n');
     child.stdin.end(); 
 });

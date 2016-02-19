@@ -69,10 +69,9 @@ function GeneratePath(type) {
             if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
             var parts = line.split(/\s+/g);
             if (parts.length < 12) return callback();
-            var path = parts[12]
-            path = path.split('443')[1];
+            var path = parts[12];
+            path = path.split(/:[0-9]\w+/g)[1];
             if (!path) return callback();
-            if (path.length < 2) return callback();
             generatePath.push(path);
         }
         callback();

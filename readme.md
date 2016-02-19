@@ -20,7 +20,7 @@ Usage: cflogreader <s3url>
 
 ### generatepath
 
-Takes different types of logs as input and streams paths to `stdout`.
+Takes different types of logs as input and streams paths to `stdout`. Supported types include "cloudfront" and "elb".
 
 ```sh
 Usage: generatepath <type>

@@ -169,9 +169,5 @@ function SampleStream(options) {
         callback();
     };
 
-    sampleStream._flush = function(callback) {
-        callback();
-    };
-
     return sampleStream;
 }

@@ -5,12 +5,14 @@ var zlib = require('zlib');
 var url = require('url');
 var stream = require('stream');
 var queue = require('queue-async');
+var crypto = require('crypto');
 
 module.exports = {};
 module.exports.LogStream = LogStream;
 module.exports.ScanGunzip = ScanGunzip;
 module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
+module.exports.SampleStream = SampleStream;
 
 /**
  * Create a readable line-oriented stream of CF logs.
@@ -134,4 +136,42 @@ function RequestStream(options) {
     };
 
     return requestStream;
+}
+
+/**
+ * Emit lines at a specified sample rate & with optional filter regex.
+ * Behaves deterministically so given param/input combinations will return
+ * reliably identical results.
+ * @param {object} options
+ * @param {number} options.sample - Required. Sample rate between 0 and 1.0
+ * @param {string} options.filter - Optional. Regex pre-filter applied to input.
+ */
+function SampleStream(options) {
+    options = options || {};
+    if (!options.rate) throw new Error('must specify a sample rate (0 < sample < 1)');
+    if ((parseFloat(options.rate) <= 0) || (parseFloat(options.rate) >= 1)) throw new Error('rate must be between 0 and 1');
+
+    var sampleStream = new stream.Transform({ objectMode: true });
+    sampleStream.count = 0;
+    sampleStream.threshold = Math.round(parseFloat(options.rate) * Math.pow(2, 16));
+    if (options.filter) sampleStream.filter = new RegExp(options.filter);
+    sampleStream._transform = function(line, enc, callback) {
+        if (!line) return callback();
+
+        if ((sampleStream.filter) && (!sampleStream.filter.test(line)))
+            return callback();
+
+        var hash = crypto.createHash('md5').update('cloudfront-log-read-salt-' + sampleStream.count).digest().readUInt16LE(0);
+        if (hash < sampleStream.threshold)
+            sampleStream.push(line);
+        sampleStream.count++;
+
+        callback();
+    };
+
+    sampleStream._flush = function(callback) {
+        callback();
+    };
+
+    return sampleStream;
 }

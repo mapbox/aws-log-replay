@@ -4,7 +4,7 @@ var reader = require('..');
 var split = require('split');
 var argv = require('minimist')(process.argv.slice(2));
 
-if (!argv.sample) {
+if (!argv.rate) {
   console.error('Usage: sample --rate=<f> [--filter=<s>]');
   process.exit(1);
 }

@@ -1,6 +1,6 @@
 {
   "name": "cloudfront-log-reader",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Read CloudFront logs files stored in AWS S3",
   "main": "index.js",
   "repository": "",

@@ -33,3 +33,11 @@ Makes replay requests to the `baseurl`. Expects paths to be piped to `stdin`. (O
 ```sh
 Usage: pathreplay <baseurl> [--concurrency=<n>]
 ```
+
+### sample
+
+Emits a repeatable set of input lines piped to `stdin` at a given sampling rate. The number of lines emitted will approach the specific rate over sufficiently large samples, but may diverge for small sample sizes. Sampling rates should be specified as a decimal number between zero and one. Optionally accepts a `filter` argument that restricts the sampled set to lines matching the specified regular expression.
+
+```sh
+Usage: sample --rate=<rate> [--filter=<filter>]
+```

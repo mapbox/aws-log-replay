@@ -15,6 +15,22 @@ module.exports.GeneratePath = GeneratePath;
 module.exports.SampleStream = SampleStream;
 
 /**
+ * decode a path according to cloudfront character encoding spec
+ * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+ * @param {string path} - a cloudfront path to decode
+ */
+function cloudFrontDecode(path) {
+    var whitelist = ['3C', '3E', '22', '23', '25', '7B', '7D', '7C', '5C', '5E', '7E', '5B', '5D', '60', '27', '20'];
+    return path.replace(/%([\dA-F]{2})/g, function(match, hex) {
+        var code = parseInt(hex, 16);
+        if ((code < 32) || (code > 127) || (whitelist.indexOf(hex) !== -1))
+            return String.fromCharCode(code);
+        else
+            return match;
+    });
+}
+
+/**
  * Create a readable line-oriented stream of CF logs.
  * @param {string} uri - An s3 url with prefix to CF logs. Example: 's3://mybucket/cf-logs/'
  * @param {object} options
@@ -62,9 +78,9 @@ function GeneratePath(type) {
             var parts = line.split(/\s+/g);
             if (parts.length > 7) {
                 if (parts[11] && parts[11] !== "-") {
-                    generatePath.push(parts[7] + "?" + parts[11]);
+                    generatePath.push(cloudFrontDecode(parts[7] + "?" + parts[11]));
                 } else {
-                    generatePath.push(parts[7]);
+                    generatePath.push(cloudFrontDecode(parts[7]));
                 }
             }
         } else if (type.toLowerCase() == 'elb') {

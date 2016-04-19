@@ -35,10 +35,11 @@ function DecodeStream(options) {
     var decodeStream = new stream.Transform({ objectMode: true });
     decodeStream._transform = function(line, enc, callback) {
         if (!line) return callback();
-        sampleStream.push(cloudFrontDecode(line));
+        line = cloudFrontDecode(line).replace(/access_token=.*?([&\?$])/, 'access_token=' + process.env.MapboxAccessToken + '$1');
+        decodeStream.push(line);
         callback();
     };
-    return sampleStream;
+    return decodeStream;
 }
 
 

@@ -13,6 +13,7 @@ module.exports.ScanGunzip = ScanGunzip;
 module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
 module.exports.SampleStream = SampleStream;
+module.exports.DecodeStream = DecodeStream;
 
 /**
  * decode a path according to cloudfront character encoding spec
@@ -29,6 +30,17 @@ function cloudFrontDecode(path) {
             return match;
     });
 }
+
+function DecodeStream(options) {
+    var decodeStream = new stream.Transform({ objectMode: true });
+    decodeStream._transform = function(line, enc, callback) {
+        if (!line) return callback();
+        sampleStream.push(cloudFrontDecode(line));
+        callback();
+    };
+    return sampleStream;
+}
+
 
 /**
  * Create a readable line-oriented stream of CF logs.

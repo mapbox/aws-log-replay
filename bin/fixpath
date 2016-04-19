@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+var reader = require('..');
+var split = require('split');
+var argv = require('minimist')(process.argv.slice(2));
+
+if (!argv.rate) {
+  console.error('Usage: sample --rate=<f> [--filter=<s>]');
+  process.exit(1);
+}
+
+var decodeStream = reader.DecodeStream();
+process.stdin
+    .pipe(split())
+    .pipe(decodeStream)
+    .on('error', function(err) {
+        console.error(err);
+        process.exit(1);
+    })
+    .on('data', function(data) {
+        console.log(data.toString('utf8'));
+    });

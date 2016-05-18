@@ -1,6 +1,6 @@
 cloudfront-log-reader
 ---------------------
-Exposes AWS CloudFront logs from S3 as a node.js readable stream and provides additional tools for working with CF logs. See `api.md` for JS API.
+Exposes AWS CloudFront logs from S3 as a node.js readable stream and provides additional tools for working with CF logs. See `api.md` for JS API. This project uses the AWS JavaScript SDK: you will need to [configure your own credentials](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html).
 
 ```
 var reader = require('cloudfront-log-reader');

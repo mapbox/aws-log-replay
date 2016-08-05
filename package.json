@@ -23,7 +23,8 @@
   "bin": {
     "cflogreader": "./bin/cflogreader",
     "pathreplay": "./bin/pathreplay",
-    "generatepath": "./bin/generatepath"
+    "generatepath": "./bin/generatepath",
+    "sample": "./bin/sample"
   },
   "scripts": {
     "doc": "documentation -f md > api.md",

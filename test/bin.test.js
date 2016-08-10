@@ -96,22 +96,6 @@ tape('setup', function(assert) {
     }
 });
 
-tape('cflogreader: usage', function(assert) {
-    exec(__dirname + '/../bin/cflogreader', {env:process.env}, function(err, stdout, stderr) {
-        assert.equal(err.code, 1, 'exits 1');
-        assert.equal(stderr, 'Usage: cflogreader <s3url>\n', 'shows usage');
-        assert.end();
-    });
-});
-
-tape('cflogreader', function(assert) {
-    exec(__dirname + '/../bin/cflogreader s3://mapbox/cloudfront-log-reader/', {env:process.env}, function(err, stdout, stderr) {
-        assert.ifError(err, 'exit 0');
-        assert.equal(/d3eju24r2ptc5d\.cloudfront\.net/.test(stdout), true, 'outputs log lines');
-        assert.end();
-    });
-});
-
 tape('generatepath: usage', function(assert) {
     exec(__dirname + '/../bin/generatepath', {env:process.env}, function(err, stdout, stderr) {
         assert.equal(err.code, 1, 'exits 1');

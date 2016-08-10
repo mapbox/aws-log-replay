@@ -3,13 +3,12 @@ var tape = require('tape');
 var fs = require('fs');
 var split = require('split');
 var AWS = require('aws-sdk-mock');
-var getObjectResponse = require('./fixtures/getObjectResponse.json');
 
 function testFunc(r, f, expected, t) {
      var sample = reader.SampleStream({rate: (r * 0.1), filter: f});
 
     AWS.mock('S3', 'getObject', function (params, callback) {
-        callback(null, getObjectResponse);
+        callback(null, fs.readFileSync(path.join(__dirname, 'fixtures/getObjectResponse.txt')).toString());
     });
 
     var getStream = require('s3scan').Get('./fixtures/AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a.gz');

@@ -3,13 +3,15 @@ var tape = require('tape');
 var fs = require('fs');
 var split = require('split');
 var AWS = require('aws-sdk-mock');
+var path = require('path');
+
+AWS.mock('S3', 'getObject', function (params, callback) {
+    console.log('parameter', params);
+    callback(null, fs.readFileSync(path.join(__dirname, 'fixtures/getObjectResponse.txt')).toString());
+});
 
 function testFunc(r, f, expected, t) {
-     var sample = reader.SampleStream({rate: (r * 0.1), filter: f});
-
-    AWS.mock('S3', 'getObject', function (params, callback) {
-        callback(null, fs.readFileSync(path.join(__dirname, 'fixtures/getObjectResponse.txt')).toString());
-    });
+    var sample = reader.SampleStream({rate: (r * 0.1), filter: f});
 
     var getStream = require('s3scan').Get('./fixtures/AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a.gz');
 
@@ -28,7 +30,7 @@ function testFunc(r, f, expected, t) {
 
     for (var k = 0; k < 1000; k++) {
     // each of these is 9 records long
-        transformedStream.write({Body: fs.readFileSync(__dirname + '/fixtures/AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a.gz')});
+        transformedStream.write({Body: fs.readFileSync(path.join(__dirname + '/fixtures/AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a.gz'))});
     }
     transformedStream.end();
 }

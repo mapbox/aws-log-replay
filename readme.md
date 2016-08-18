@@ -10,13 +10,7 @@ logStream.pipe(process.stdout);
 
 This module also provides two small wrapper commands for usings its functionality from the commandline.
 
-### s3scan
-
-Gunzips S3 files and streams CF log lines to `stdout`.
-
-``` sh
-Usage: npm install -g s3scan
-s3scan <s3url> --gunzip
+You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream CloudFront and ELB logs into these tools.
 
 ```
 

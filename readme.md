@@ -10,12 +10,14 @@ logStream.pipe(process.stdout);
 
 This module also provides two small wrapper commands for usings its functionality from the commandline.
 
-### cflogreader
+### s3scan
 
-Streams CF log lines to `stdout`.
+Gunzips S3 files and streams CF log lines to `stdout`.
 
 ``` sh
-Usage: cflogreader <s3url>
+Usage: npm install -g s3scan
+s3scan <s3url> --gunzip
+
 ```
 
 ### generatepath

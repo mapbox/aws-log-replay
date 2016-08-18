@@ -23,7 +23,6 @@
     "tape": "3.5.x"
   },
   "bin": {
-    "cflogreader": "./bin/cflogreader",
     "pathreplay": "./bin/pathreplay",
     "generatepath": "./bin/generatepath",
     "sample": "./bin/sample"

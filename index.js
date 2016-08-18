@@ -8,8 +8,6 @@ var queue = require('queue-async');
 var crypto = require('crypto');
 
 module.exports = {};
-module.exports.LogStream = LogStream;
-module.exports.ScanGunzip = ScanGunzip;
 module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
 module.exports.SampleStream = SampleStream;
@@ -28,41 +26,6 @@ function cloudFrontDecode(path) {
         else
             return match;
     });
-}
-
-/**
- * Create a readable line-oriented stream of CF logs.
- * @param {string} uri - An s3 url with prefix to CF logs. Example: 's3://mybucket/cf-logs/'
- * @param {object} options
- * @param {object} options.agent - Optional. An http agent to use when requesting logs
- */
-function LogStream(uri, options) {
-    options = options || {};
-
-    var s3scanOpts = { agent: options.agent, highWaterMark: 128 };
-    var scanGunzip = ScanGunzip();
-    var scan = s3scan.Scan(uri, s3scanOpts)
-        .on('error', function(err) {
-            scanGunzip.emit('error', err);
-        });
-    scan.pipe(scanGunzip).pipe(split());
-    return scanGunzip;
-}
-
-/**
- * Transform stream for converting gzipped CF logs from an s3scan Scan stream
- * to line log text.
- */
-function ScanGunzip() {
-    var scanGunzip = new stream.Transform({ objectMode: true, highWaterMark: 8 });
-    scanGunzip._transform = function(data, enc, callback) {
-        zlib.gunzip(data.Body, function(err, body) {
-            if (err) return callback(err);
-            scanGunzip.push(body.toString('utf8'));
-            callback();
-        });
-    };
-    return scanGunzip;
 }
 
 /**

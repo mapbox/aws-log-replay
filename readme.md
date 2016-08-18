@@ -10,12 +10,8 @@ logStream.pipe(process.stdout);
 
 This module also provides two small wrapper commands for usings its functionality from the commandline.
 
-### cflogreader
+You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream CloudFront and ELB logs into these tools.
 
-Streams CF log lines to `stdout`.
-
-``` sh
-Usage: cflogreader <s3url>
 ```
 
 ### generatepath

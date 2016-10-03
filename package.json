@@ -1,14 +1,12 @@
 {
-  "name": "cloudfront-log-reader",
-  "version": "2.2.1",
-  "description": "Read CloudFront logs files stored in AWS S3",
+  "name": "aws-log-replay",
+  "version": "1.0.0",
+  "description": "Transform and replay CloudFront and ELB Classic / ALB logs.",
   "main": "index.js",
-  "repository": "",
   "author": "Mapbox",
   "license": "BSD",
   "readmeFilename": "README.md",
   "dependencies": {
-    "agentkeepalive": "^2.0.3",
     "aws-sdk-mock": "^1.4.1",
     "minimist": "^1.2.0",
     "queue-async": "1.0.x",
@@ -18,7 +16,6 @@
     "split": "1.0.x"
   },
   "devDependencies": {
-    "aws-sdk": "2.2.x",
     "documentation": "2.0.x",
     "tape": "3.5.x"
   },
@@ -28,7 +25,6 @@
     "sample": "./bin/sample"
   },
   "scripts": {
-    "doc": "documentation -f md > api.md",
     "test": "tape test/*.test.js"
   }
 }

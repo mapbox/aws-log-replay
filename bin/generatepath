@@ -5,9 +5,9 @@ var split = require('split');
 var reader = require('..');
 
 var type = process.argv[2];
-if (!type || (type !== 'cloudfront' && type !== 'elb')) {
+if (!type || (type !== 'cloudfront' && type !== 'lb')) {
   console.error('Usage: generatepath <type>');
-  console.error('<type> can be "cloudfront" or "elb"');
+  console.error('<type> can be "cloudfront" or "lb"');
   process.exit(1);
 }
 

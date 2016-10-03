@@ -1,22 +1,15 @@
-cloudfront-log-reader
+aws-log-replay
 ---------------------
-Exposes AWS CloudFront logs from S3 as a node.js readable stream and provides additional tools for working with CF logs. See `api.md` for JS API. This project uses the AWS JavaScript SDK: you will need to [configure your own credentials](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html).
 
-```
-var reader = require('cloudfront-log-reader');
-var logStream = reader.LogStream('s3://mybucket/cf-logs/');
-logStream.pipe(process.stdout);
-```
+Transform and replay a stream of AWS CloudFront, ELB Classic, or ALB logs.
 
-This module also provides two small wrapper commands for usings its functionality from the commandline.
+This project uses the AWS JavaScript SDK: you will need to [configure your own credentials](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html).
 
-You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream CloudFront and ELB logs into these tools.
-
-```
+You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream logs into these tools.
 
 ### generatepath
 
-Takes different types of logs as input and streams paths to `stdout`. Supported types include "cloudfront" and "elb".
+Takes different types of logs as input and streams only the path to `stdout`. Supported types include "cloudfront" for CloudFront logs and "lb" for ELB Classic or ALB logs.
 
 ```sh
 Usage: generatepath <type>

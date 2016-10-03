@@ -46,7 +46,7 @@ function GeneratePath(type) {
                     generatePath.push(cloudFrontDecode(parts[7]));
                 }
             }
-        } else if (type.toLowerCase() == 'elb') {
+        } else if (type.toLowerCase() == 'lb') {
             if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
             var parts = line.split(/\s+/g);
             if (parts.length < 12) return callback();

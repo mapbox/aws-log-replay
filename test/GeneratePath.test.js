@@ -22,7 +22,7 @@ tape('GeneratePath [cloudfront]', function(assert) {
 
 tape('GeneratePath [elb]', function(assert) {
     var data = [];
-    var generatePath = reader.GeneratePath('elb');
+    var generatePath = reader.GeneratePath('lb');
     generatePath.on('data', function(d) {
         data.push(d);
     });

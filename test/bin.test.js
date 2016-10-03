@@ -3,7 +3,6 @@ var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var tape = require('tape');
 var queue = require('queue-async');
-var S3 = new (require('aws-sdk')).S3();
 var http = require('http');
 var server;
 
@@ -84,7 +83,7 @@ tape('teardown', function(assert) {
 tape('generatepath: usage', function(assert) {
     exec(__dirname + '/../bin/generatepath', {env:process.env}, function(err, stdout, stderr) {
         assert.equal(err.code, 1, 'exits 1');
-        assert.equal(stderr, 'Usage: generatepath <type>\n<type> can be "cloudfront" or "elb"\n', 'shows usage');
+        assert.equal(stderr, 'Usage: generatepath <type>\n<type> can be "cloudfront" or "lb"\n', 'shows usage');
         assert.end();
     });
 });
@@ -112,8 +111,8 @@ tape('generatepath [cloudfront]', function(assert) {
     child.stdin.end();
 });
 
-tape('generatepath [cloudfront]', function(assert) {
-    var child = spawn(__dirname + '/../bin/generatepath', ['elb']);
+tape('generatepath [lb]', function(assert) {
+    var child = spawn(__dirname + '/../bin/generatepath', ['lb']);
     var data = [];
     child.stdout.on('data', function(d) {
         data.push(d.toString());

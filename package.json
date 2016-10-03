@@ -1,12 +1,13 @@
 {
   "name": "aws-log-replay",
   "version": "1.0.0",
-  "description": "Transform and replay CloudFront and ELB Classic / ALB logs.",
+  "description": "Transform and replay CloudFront, ELB Classic, and ALB logs.",
   "main": "index.js",
   "author": "Mapbox",
   "license": "BSD",
   "readmeFilename": "README.md",
   "dependencies": {
+    "agentkeepalive": "^2.2.0",
     "aws-sdk-mock": "^1.4.1",
     "minimist": "^1.2.0",
     "queue-async": "1.0.x",

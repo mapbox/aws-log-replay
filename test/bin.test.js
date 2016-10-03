@@ -81,21 +81,6 @@ tape('teardown', function(assert) {
     server.close(assert.end);
 });
 
-tape('setup', function(assert) {
-    var q = queue();
-    q.defer(upload, 'AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a.gz');
-    q.defer(upload, 'AAAAAAAAAAAAAA.2015-10-19-17.e5b6526b.gz');
-    q.defer(upload, 'AAAAAAAAAAAAAA.2015-10-19-17.e5b6526c.gz');
-    q.awaitAll(assert.end);
-    function upload(file, done) {
-        S3.putObject({
-            Bucket: 'mapbox',
-            Key: 'cloudfront-log-reader/testing/' + file,
-            Body: fs.readFileSync(__dirname + '/fixtures/' + file)
-        }, done);
-    }
-});
-
 tape('generatepath: usage', function(assert) {
     exec(__dirname + '/../bin/generatepath', {env:process.env}, function(err, stdout, stderr) {
         assert.equal(err.code, 1, 'exits 1');
@@ -124,7 +109,7 @@ tape('generatepath [cloudfront]', function(assert) {
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/b.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/c.json	200	https://www.mapbox.com/	FakeAgent	option=2	-	Miss	FAKE==	example.com	http	784	0.314\n');
     child.stdin.write('\n');
-    child.stdin.end(); 
+    child.stdin.end();
 });
 
 tape('generatepath [cloudfront]', function(assert) {
@@ -143,5 +128,5 @@ tape('generatepath [cloudfront]', function(assert) {
     });
     child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 304 304 0 0 "GET http://green-eggs.com:80/a.json?option=1 HTTP/1.1" "Amazon CloudFront" - -\n');
     child.stdin.write('\n');
-    child.stdin.end(); 
+    child.stdin.end();
 });

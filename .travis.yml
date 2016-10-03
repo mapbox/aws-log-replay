@@ -1,7 +1,3 @@
 language: node_js
 sudo: false
-node_js: "0.10"
-env:
-  global:
-  - secure: "HZPzERN7WY9MNkZ8GsScT2NEPvCU0jIlF+goTEir8H38GMCEkhcfIP+BMSoJMjwi2oR/hn2X6Wrlp3E5JfVp2dGi4p8ZDgKtXK6+g8t8Rqv9QVY5nNHrY6W6JeKEK8YcGbVB2ip/o7FSgm7GLS8dnjh1mvQlu6l8U8Hp32vNGBM="
-  - secure: "k50iP/j/1SB7cJVHB+TDGY9W3G0zJxsHyYYsW0AT0bHyJFLGX9FOegThuFHI9g8mJvRDoMT6DEh9qE9iS9EAaZptXR10qcYxXHAYSHEOS3N11tS4pRnEiCkVZvNdJaoB3XS3t9Zl57oMfpW+/QTCN24DYUsdy9nOg8StUlg4M6s="
+node_js: "4"

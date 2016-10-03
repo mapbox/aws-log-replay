@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/mapbox/aws-log-replay.svg?branch=master)](https://travis-ci.org/mapbox/aws-log-replay)
 
-Transform and replay a stream of AWS CloudFront, ELB Classic, or ALB logs.
+Transform and replay a stream of AWS CloudFront, ELB Classic, or ALB logs. You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream logs into these tools.
 
 This project uses the AWS JavaScript SDK: you will need to [configure your own credentials](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html).
 
-You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream logs into these tools.
-
-### generatepath
+## generatepath
 
 Takes different types of logs as input and streams only the path to `stdout`. Supported types include "cloudfront" for CloudFront logs and "lb" for ELB Classic or ALB logs.
 
@@ -16,7 +14,7 @@ Takes different types of logs as input and streams only the path to `stdout`. Su
 Usage: generatepath <type>
 ```
 
-### pathreplay
+## pathreplay
 
 Makes replay requests to the `baseurl`. Expects paths to be piped to `stdin`. (Optional) Control concurrency of replay requests with `--concurrency` flag. Default is 100.
 
@@ -24,7 +22,7 @@ Makes replay requests to the `baseurl`. Expects paths to be piped to `stdin`. (O
 Usage: pathreplay <baseurl> [--concurrency=<n>]
 ```
 
-### sample
+## sample
 
 Emits a repeatable set of input lines piped to `stdin` at a given sampling rate. The number of lines emitted will approach the specific rate over sufficiently large samples, but may diverge for small sample sizes. Sampling rates should be specified as a decimal number between zero and one. Optionally accepts a `filter` argument that restricts the sampled set to lines matching the specified regular expression.
 

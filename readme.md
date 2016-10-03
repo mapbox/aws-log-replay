@@ -1,5 +1,6 @@
-aws-log-replay
----------------------
+# aws-log-replay
+
+[![Build Status](https://travis-ci.org/mapbox/aws-log-replay.svg?branch=master)](https://travis-ci.org/mapbox/aws-log-replay)
 
 Transform and replay a stream of AWS CloudFront, ELB Classic, or ALB logs.
 

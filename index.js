@@ -37,6 +37,7 @@ function GeneratePath(type) {
     var generatePath = new stream.Transform({ objectMode: true });
     generatePath._transform = function(line, enc, callback) {
         if (!line) return callback();
+        if (Buffer.isBuffer(line)) line = line.toString('utf-8');
         if (type.toLowerCase() == 'cloudfront') {
             var parts = line.split(/\s+/g);
             if (parts.length > 7) {

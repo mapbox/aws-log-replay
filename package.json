@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "documentation": "2.0.x",
+    "eslint": "^3.11.1",
     "tape": "3.5.x"
   },
   "bin": {
@@ -27,6 +28,7 @@
     "sample": "./bin/sample"
   },
   "scripts": {
+    "pretest": "eslint test bin index.js",
     "test": "tape test/*.test.js"
   }
 }

@@ -98,12 +98,13 @@ function RequestStream(options) {
             request({
                 agent: options.agent,
                 encoding: null,
-                uri: requrl
+                uri: requrl,
+                time: true
             }, function(err, res, body) {
                 requestStream.pending--;
                 if (err) return requestStream.emit('error', err);
                 if (res.statusCode !== 200) return next();
-                requestStream.push({ url: requrl, body: body });
+                requestStream.push({ url: requrl, elapsedTime: res.elapsedTime, body: body });
                 requestStream.got++;
                 next();
             });

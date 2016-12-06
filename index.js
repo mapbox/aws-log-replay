@@ -6,6 +6,7 @@ var url = require('url');
 var stream = require('stream');
 var queue = require('queue-async');
 var crypto = require('crypto');
+var parallel = require('parallel-stream');
 
 module.exports = {};
 module.exports.RequestStream = RequestStream;
@@ -72,50 +73,26 @@ function RequestStream(options) {
     if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
     if (!options.hwm) options.hwm = 100;
 
-    var starttime = Date.now();
-    var requestStream = new stream.Transform(options);
-    requestStream._readableState.objectMode = true;
-    requestStream.got = 0;
-    requestStream.pending = 0;
-    requestStream.queue = queue(options.hwm);
-    requestStream.queue.awaitAll(function(err) {
-        if (err) requestStream.emit('error', err);
-    });
-
-    requestStream._transform = function(pathname, enc, callback) {
+    function transform(pathname, enc, callback) {
         if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
         if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
         var uri = url.parse(pathname, true);
-
-        if (requestStream.pending > (options.hwm * 1.5)) {
-            return setImmediate(requestStream._transform.bind(requestStream), pathname, enc, callback);
-        }
-
         var requrl = options.baseurl + url.format(uri);
-        requestStream.pending++;
-        requestStream.queue.defer(function(next) {
-            request({
-                agent: options.agent,
-                encoding: null,
-                uri: requrl
-            }, function(err, res, body) {
-                requestStream.pending--;
-                if (err) return requestStream.emit('error', err);
-                if (res.statusCode !== 200) return next();
-                requestStream.push({ url: requrl, body: body });
-                requestStream.got++;
-                next();
-            });
+
+        request({
+            agent: options.agent,
+            encoding: null,
+            uri: requrl
+        }, (err, res, body) => {
+            if (err) return callback(err);
+            if (res.statusCode !== 200) return callback();
+            this.push({ url: requrl, body: body });
+            callback();
         });
-        callback();
-    };
+    }
 
-    requestStream._flush = function(callback) {
-        requestStream.queue.awaitAll(callback);
-    };
-
-    return requestStream;
+    return parallel.transform(transform, { concurrency: options.hwm, objectMode: true });
 }
 
 /**

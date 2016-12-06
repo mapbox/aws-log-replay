@@ -70,6 +70,8 @@ function RequestStream(options) {
   if (!options.hwm) options.hwm = 100;
 
   function transform(pathname, enc, callback) {
+    if (this._closed) return setImmediate(callback);
+    
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
@@ -88,7 +90,12 @@ function RequestStream(options) {
     });
   }
 
-  return parallel.transform(transform, { concurrency: options.hwm, objectMode: true });
+  var requestStream = parallel.transform(transform, { concurrency: options.hwm, objectMode: true });
+  requestStream.close = function() {
+    requestStream._closed = true;
+  };
+
+  return requestStream;
 }
 
 /**

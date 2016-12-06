@@ -17,6 +17,7 @@ tape('setup', function(assert) {
       res.end();
     }, 1000);
   });
+  server.reset = function() { count = 0; };
   server.listen(9999, assert.end);
 });
 
@@ -59,6 +60,27 @@ tape('RequestStream', function(assert) {
     assert.deepEqual(data.map(function(d) { return d.obj; }).sort(), ['a', 'b'], 'emits objects a, b');
     assert.end();
   });
+  reqstream.write('/a.json?option=1\n');
+  reqstream.write('/b.json?option=2\n');
+  reqstream.write('/c.json?option=2\n');
+  reqstream.write('\n');
+  reqstream.end();
+});
+
+tape('RequestStream close', function(assert) {
+  server.reset();
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:8888' // all requests ought to fail
+  });
+
+  reqstream.on('error', function(err) { assert.ifError(err, 'should not fail'); });
+  reqstream.on('finish', function() {
+    assert.equal(count, 0, 'no requests were made');
+    assert.end();
+  });
+
+  reqstream.close();
+  assert.ok(reqstream._closed, 'marked stream as closed');
   reqstream.write('/a.json?option=1\n');
   reqstream.write('/b.json?option=2\n');
   reqstream.write('/c.json?option=2\n');

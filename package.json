@@ -1,6 +1,6 @@
 {
   "name": "aws-log-replay",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Transform and replay CloudFront, ELB Classic, and ALB logs.",
   "main": "index.js",
   "author": "Mapbox",

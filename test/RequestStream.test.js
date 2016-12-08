@@ -52,6 +52,8 @@ tape('RequestStream', function(assert) {
   });
   reqstream.on('data', function(d) {
     assert.deepEqual(/http:\/\/localhost:9999\/(a|b)\.json/.test(d.url), true, 'data.url is object url');
+    assert.deepEqual(!isNaN(d.elapsedTime), true, 'data.elapsedTime is a number');
+    assert.deepEqual(!isNaN(d.statusCode), true, 'data.statusCode is a number');
     assert.deepEqual(Buffer.isBuffer(d.body), true, 'data.body is buffer');
     data.push(JSON.parse(d.body));
   });

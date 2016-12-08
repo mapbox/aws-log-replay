@@ -71,7 +71,7 @@ function RequestStream(options) {
 
   function transform(pathname, enc, callback) {
     if (this._closed) return setImmediate(callback);
-    
+
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
@@ -81,11 +81,12 @@ function RequestStream(options) {
     request({
       agent: options.agent,
       encoding: null,
-      uri: requrl
+      uri: requrl,
+      time: true
     }, (err, res, body) => {
       if (err) return callback(err);
       if (res.statusCode !== 200) return callback();
-      this.push({ url: requrl, body: body });
+      this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
       callback();
     });
   }

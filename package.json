@@ -1,5 +1,5 @@
 {
-  "name": "aws-log-replay",
+  "name": "@mapbox/aws-log-replay",
   "version": "2.3.1",
   "description": "Transform and replay CloudFront, ELB Classic, and ALB logs.",
   "main": "index.js",

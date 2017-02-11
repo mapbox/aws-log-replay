@@ -1,34 +1,34 @@
 {
-  "name": "aws-log-replay",
-  "version": "2.3.1",
-  "description": "Transform and replay CloudFront, ELB Classic, and ALB logs.",
-  "main": "index.js",
-  "author": "Mapbox",
-  "license": "BSD",
-  "readmeFilename": "README.md",
-  "dependencies": {
-    "agentkeepalive": "^2.2.0",
-    "aws-sdk-mock": "^1.4.1",
-    "minimist": "^1.2.0",
-    "parallel-stream": "^1.1.2",
-    "queue-async": "1.0.x",
-    "requestretry": "1.5.x",
-    "s3scan": "0.1.x",
-    "s3urls": "^1.5.1",
-    "split": "1.0.x"
-  },
-  "devDependencies": {
-    "documentation": "2.0.x",
-    "eslint": "^3.11.1",
-    "tape": "3.5.x"
-  },
   "bin": {
-    "pathreplay": "./bin/pathreplay",
-    "generatepath": "./bin/generatepath",
-    "sample": "./bin/sample"
-  },
+    "sample": "./bin/sample", 
+    "pathreplay": "./bin/pathreplay", 
+    "generatepath": "./bin/generatepath"
+  }, 
+  "name": "aws-log-replay", 
+  "license": "BSD-2-Clause", 
+  "author": "Mapbox", 
+  "version": "2.3.1", 
+  "dependencies": {
+    "requestretry": "1.5.x", 
+    "minimist": "^1.2.0", 
+    "agentkeepalive": "^2.2.0", 
+    "s3urls": "^1.5.1", 
+    "parallel-stream": "^1.1.2", 
+    "s3scan": "0.1.x", 
+    "queue-async": "1.0.x", 
+    "aws-sdk-mock": "^1.4.1", 
+    "split": "1.0.x"
+  }, 
   "scripts": {
-    "pretest": "eslint test bin index.js",
-    "test": "tape test/*.test.js"
-  }
+    "test": "tape test/*.test.js", 
+    "pretest": "eslint test bin index.js"
+  }, 
+  "devDependencies": {
+    "documentation": "2.0.x", 
+    "tape": "3.5.x", 
+    "eslint": "^3.11.1"
+  }, 
+  "main": "index.js", 
+  "readmeFilename": "README.md", 
+  "description": "Transform and replay CloudFront, ELB Classic, and ALB logs."
 }

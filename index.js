@@ -87,7 +87,6 @@ function RequestStream(options) {
       time: true
     }, (err, res, body) => {
       if (err) return callback(err);
-      if (res.statusCode !== 200) return callback();
       this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
       callback();
     });

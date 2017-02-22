@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file. For change 
 
 ## Unreleased
 - RequestStream strictSSL option to optionally disable SSL cert checking
+- RequestStream return all HTTP status codes
 
 --
 

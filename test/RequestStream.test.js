@@ -51,11 +51,21 @@ tape('RequestStream', function(assert) {
     baseurl: 'http://localhost:9999'
   });
   reqstream.on('data', function(d) {
-    assert.deepEqual(/http:\/\/localhost:9999\/(a|b)\.json/.test(d.url), true, 'data.url is object url');
-    assert.deepEqual(!isNaN(d.elapsedTime), true, 'data.elapsedTime is a number');
-    assert.deepEqual(!isNaN(d.statusCode), true, 'data.statusCode is a number');
+    switch (d.statusCode) {
+    case 200:
+      assert.deepEqual(/http:\/\/localhost:9999\/(a|b)\.json/.test(d.url), true, 'data.url is object url');
+      data.push(JSON.parse(d.body));
+      break;
+    case 404:
+      assert.deepEqual(/http:\/\/localhost:9999\/c\.json/.test(d.url), true, 'data.url is object url');
+      break;
+    default:
+      assert.fail('Invalid statusCode ' + d.statusCode);
+      return;
+    }
+
     assert.deepEqual(Buffer.isBuffer(d.body), true, 'data.body is buffer');
-    data.push(JSON.parse(d.body));
+    assert.deepEqual(!isNaN(d.elapsedTime), true, 'data.elapsedTime is a number');
   });
   reqstream.on('end', function() {
     assert.deepEqual(data.length, 2, 'emits 2 objects');

@@ -29,7 +29,9 @@ tape('pathreplay', function(assert) {
   var child = spawn(__dirname + '/../bin/pathreplay', ['http://localhost:9999']);
   var data = [];
   child.stdout.on('data', function(d) {
-    data.push(d.toString());
+    if (d.toString() != '\n') {
+      data.push(d.toString());
+    }
   });
   child.stderr.on('data', function(data) {
     assert.ifError(data);

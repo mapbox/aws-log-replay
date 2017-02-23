@@ -7,7 +7,7 @@
   "name": "aws-log-replay", 
   "license": "BSD-2-Clause", 
   "author": "Mapbox", 
-  "version": "2.3.1", 
+  "version": "2.4.0",
   "dependencies": {
     "requestretry": "1.5.x", 
     "minimist": "^1.2.0", 

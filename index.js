@@ -63,6 +63,7 @@ function GeneratePath(type) {
  * host. LH side expects a line-oriented stream of paths (& querystrings).
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
+ * @param {string} options.strictSSL - Optional. If true (default), requires SSL/TLS certificates to be valid
  */
 function RequestStream(options) {
   options = options || {};
@@ -80,6 +81,7 @@ function RequestStream(options) {
 
     request({
       agent: options.agent,
+      strictSSL: options.strictSSL === false ? false : true,
       encoding: null,
       uri: requrl,
       time: true

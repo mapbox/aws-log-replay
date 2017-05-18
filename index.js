@@ -49,6 +49,7 @@ function GeneratePath(type) {
       parts = line.split(/\s+/g);
       if (parts.length < 12) return callback();
       var path = parts.length === 18 ? parts[12] : parts[13];
+      if (path === undefined) return callback(new Error('Faild to parse log file'));
       path = path.split(/:[0-9]\w+/g)[1];
       if (!path) return callback();
       generatePath.push(path);

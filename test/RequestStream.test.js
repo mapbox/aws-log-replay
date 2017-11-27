@@ -3,11 +3,14 @@ var tape = require('tape');
 var http = require('http');
 var server;
 var count = 0;
+var requireFooHeader = false;
 
 tape('setup', function(assert) {
   server = http.createServer(function(req, res) {
     count++;
-    if (/\/c\.json/.test(req.url)) {
+    if (requireFooHeader && !req.headers['foo']) {
+      res.writeHead(403);
+    } else if (/\/c\.json/.test(req.url)) {
       res.writeHead(404);
     } else {
       res.writeHead(200);
@@ -70,6 +73,83 @@ tape('RequestStream', function(assert) {
   reqstream.on('end', function() {
     assert.deepEqual(data.length, 2, 'emits 2 objects');
     assert.deepEqual(data.map(function(d) { return d.obj; }).sort(), ['a', 'b'], 'emits objects a, b');
+    assert.end();
+  });
+  reqstream.write('/a.json?option=1\n');
+  reqstream.write('/b.json?option=2\n');
+  reqstream.write('/c.json?option=2\n');
+  reqstream.write('\n');
+  reqstream.end();
+});
+
+tape('RequestStream (without required headers)', function(assert) {
+  var data = [];
+  requireFooHeader = true;
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999'
+  });
+  reqstream.on('data', function(d) {
+    switch (d.statusCode) {
+    case 200:
+      assert.fail('shouldn\'t succeed without required header');
+      data.push(JSON.parse(d.body));
+      break;
+    case 403:
+      assert.deepEqual(/http:\/\/localhost:9999\/.\.json/.test(d.url), true, 'data.url is object url');
+      break;
+    default:
+      assert.fail('Invalid statusCode ' + d.statusCode);
+      return;
+    }
+
+    assert.deepEqual(Buffer.isBuffer(d.body), true, 'data.body is buffer');
+    assert.deepEqual(!isNaN(d.elapsedTime), true, 'data.elapsedTime is a number');
+  });
+  reqstream.on('end', function() {
+    assert.deepEqual(data.length, 0, 'emits 0 objects');
+    requireFooHeader = false;
+    assert.end();
+  });
+  reqstream.write('/a.json?option=1\n');
+  reqstream.write('/b.json?option=2\n');
+  reqstream.write('/c.json?option=2\n');
+  reqstream.write('\n');
+  reqstream.end();
+});
+
+tape('RequestStream (with required headers)', function(assert) {
+  var data = [];
+  requireFooHeader = true;
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999',
+    headers: {
+      foo: 'bar'
+    }
+  });
+  reqstream.on('data', function(d) {
+    switch (d.statusCode) {
+    case 200:
+      assert.deepEqual(/http:\/\/localhost:9999\/(a|b)\.json/.test(d.url), true, 'data.url is object url');
+      data.push(JSON.parse(d.body));
+      break;
+    case 403:
+      assert.fail('should not return 403');
+      break;
+    case 404:
+      assert.deepEqual(/http:\/\/localhost:9999\/c\.json/.test(d.url), true, 'data.url is object url');
+      break;
+    default:
+      assert.fail('Invalid statusCode ' + d.statusCode);
+      return;
+    }
+
+    assert.deepEqual(Buffer.isBuffer(d.body), true, 'data.body is buffer');
+    assert.deepEqual(!isNaN(d.elapsedTime), true, 'data.elapsedTime is a number');
+  });
+  reqstream.on('end', function() {
+    assert.deepEqual(data.length, 2, 'emits 2 objects');
+    assert.deepEqual(data.map(function(d) { return d.obj; }).sort(), ['a', 'b'], 'emits objects a, b');
+    requireFooHeader = false;
     assert.end();
   });
   reqstream.write('/a.json?option=1\n');

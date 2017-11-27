@@ -79,13 +79,17 @@ function RequestStream(options) {
     var uri = url.parse(pathname, true);
     var requrl = options.baseurl + url.format(uri);
 
-    request({
+    var opts = {
       agent: options.agent,
       strictSSL: options.strictSSL === false ? false : true,
       encoding: null,
       uri: requrl,
       time: true
-    }, (err, res, body) => {
+    };
+    if (options.headers) {
+      opts.headers = options.headers;
+    }
+    request(opts, (err, res, body) => {
       if (err) return callback(err);
       this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
       callback();

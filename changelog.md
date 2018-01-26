@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file. For change 
 
 --
 
+## 2.4.1 2018-01-26
+
+- Allow timestamps in url paths
+
 ## 2.4.0 2017-02-23
 
 - RequestStream strictSSL option to optionally disable SSL cert checking

@@ -1,34 +1,38 @@
 {
   "bin": {
-    "sample": "./bin/sample", 
-    "pathreplay": "./bin/pathreplay", 
+    "sample": "./bin/sample",
+    "pathreplay": "./bin/pathreplay",
     "generatepath": "./bin/generatepath"
-  }, 
-  "name": "aws-log-replay", 
-  "license": "BSD-2-Clause", 
-  "author": "Mapbox", 
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "name": "aws-log-replay",
+  "license": "BSD-2-Clause",
+  "author": "Mapbox",
   "version": "2.4.1",
   "dependencies": {
-    "requestretry": "1.5.x", 
-    "minimist": "^1.2.0", 
-    "agentkeepalive": "^2.2.0", 
-    "s3urls": "^1.5.1", 
-    "parallel-stream": "^1.1.2", 
-    "s3scan": "0.1.x", 
-    "queue-async": "1.0.x", 
-    "aws-sdk-mock": "^1.4.1", 
-    "split": "1.0.x"
-  }, 
+    "agentkeepalive": "^3.5.1",
+    "aws-sdk-mock": "^4.0.0",
+    "d3-queue": "^3.0.7",
+    "minimist": "^1.2.0",
+    "parallel-stream": "^1.1.2",
+    "queue-async": "^1.2.1",
+    "requestretry": "^2.0.0",
+    "s3scan": "^0.2.3",
+    "s3urls": "^1.5.2",
+    "split": "^1.0.1"
+  },
   "scripts": {
-    "test": "tape test/*.test.js", 
+    "test": "tape test/*.test.js",
     "pretest": "eslint test bin index.js"
-  }, 
+  },
   "devDependencies": {
-    "documentation": "2.0.x", 
-    "tape": "3.5.x", 
+    "documentation": "2.0.x",
+    "tape": "3.5.x",
     "eslint": "^3.11.1"
-  }, 
-  "main": "index.js", 
-  "readmeFilename": "README.md", 
+  },
+  "main": "index.js",
+  "readmeFilename": "README.md",
   "description": "Transform and replay CloudFront, ELB Classic, and ALB logs."
 }

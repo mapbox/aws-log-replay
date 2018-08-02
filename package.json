@@ -29,8 +29,9 @@
   },
   "devDependencies": {
     "documentation": "2.0.x",
-    "tape": "3.5.x",
-    "eslint": "^3.11.1"
+    "eslint": "^3.11.1",
+    "request": "^2.87.0",
+    "tape": "3.5.x"
   },
   "main": "index.js",
   "readmeFilename": "README.md",

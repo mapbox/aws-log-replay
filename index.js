@@ -48,7 +48,13 @@ function GeneratePath(type) {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);
       if (parts.length < 12) return callback();
-      var path = parts.length === 18 ? parts[12] : parts[13];
+
+      var path;
+      if (process.env.AWS_DEFAULT_REGION === 'cn-north-1') {
+        path = parts[12];
+      } else {
+        path = parts.length === 18 ? parts[12] : parts[13];
+      }
       path = url.parse(path).path;
       if (!path) return callback();
       generatePath.push(path);

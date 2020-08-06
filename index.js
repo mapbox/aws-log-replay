@@ -7,6 +7,7 @@ var parallel = require('parallel-stream');
 module.exports = {};
 module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
+module.exports.GetReferer = GetReferer;
 module.exports.SampleStream = SampleStream;
 
 /**
@@ -59,33 +60,59 @@ function GeneratePath(type) {
 }
 
 /**
+ * Gets referer from cf logs
+ * @param 
+ */
+function GetReferer() {
+  var getReferer = new stream.Transform({ objectMode: true });
+  getReferer._transform = function(line, enc, callback) {
+    if (!line) return callback();
+    if (Buffer.isBuffer(line)) line = line.toString('utf-8');
+    var parts = line.split(/\s+/g);
+    if (!parts[9]) return callback();
+    var referer = parts[9];
+    if (referer === '-') return callback();
+    getReferer.push(referer);
+    console.log("REF", referer)
+    callback();
+  };
+  return getReferer;
+}
+
+/**
  * Transform stream for replaying requests from a log of paths against a specified
  * host. LH side expects a line-oriented stream of paths (& querystrings).
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
  * @param {string} options.strictSSL - Optional. If true (default), requires SSL/TLS certificates to be valid
+ * @param {boolean} options.referer - Optional. If true, include referer from requests (cloudfront logs only)
  */
 function RequestStream(options) {
   options = options || {};
   if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
   if (!options.hwm) options.hwm = 100;
-
   function transform(pathname, enc, callback) {
     if (this._closed) return setImmediate(callback);
-
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
     var uri = url.parse(pathname, true);
     var requrl = options.baseurl + url.format(uri);
 
-    request({
+    var requestOptions = {
       agent: options.agent,
       strictSSL: options.strictSSL === false ? false : true,
       encoding: null,
       uri: requrl,
       time: true
-    }, (err, res, body) => {
+    };
+
+    if (options.referer) {
+      var referer = this._transformState.writeChunk;
+      requestOptions.headers = { referer: referer };
+    }
+
+    request(requestOptions, (err, res, body) => {
       if (err) return callback(err);
       this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
       callback();

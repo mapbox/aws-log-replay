@@ -10,7 +10,7 @@
   "name": "aws-log-replay",
   "license": "BSD-2-Clause",
   "author": "Mapbox",
-  "version": "2.5.0",
+  "version": "2.6.0-dev",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
     "aws-sdk-mock": "^4.0.0",

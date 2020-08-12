@@ -42,8 +42,10 @@ function GeneratePath(type) {
         if (parts[11] && parts[11] !== '-') {
           generatePath.push(cloudFrontDecode(parts[7] + '?' + parts[11]));
         } else {
-          generatePath.push(cloudFrontDecode(parts[7]));
-        }
+      // get Referer
+      if (parts[9] && parts[9] !== '-') {
+        var referer = parts[9];
+      }
       }
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
@@ -57,26 +59,6 @@ function GeneratePath(type) {
     callback();
   };
   return generatePath;
-}
-
-/**
- * Gets referer from cf logs
- * @param 
- */
-function GetReferer() {
-  var getReferer = new stream.Transform({ objectMode: true });
-  getReferer._transform = function(line, enc, callback) {
-    if (!line) return callback();
-    if (Buffer.isBuffer(line)) line = line.toString('utf-8');
-    var parts = line.split(/\s+/g);
-    if (!parts[9]) return callback();
-    var referer = parts[9];
-    if (referer === '-') return callback();
-    getReferer.push(referer);
-    console.log("REF", referer)
-    callback();
-  };
-  return getReferer;
 }
 
 /**
@@ -107,8 +89,7 @@ function RequestStream(options) {
       time: true
     };
 
-    if (options.referer) {
-      var referer = this._transformState.writeChunk;
+    if (referer) {
       requestOptions.headers = { referer: referer };
     }
 

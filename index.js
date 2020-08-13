@@ -49,7 +49,7 @@ function GeneratePath(type, keepReferer = false) {
         var referer = parts[9];
       }
       if (path && referer) generatePath.push([path, referer]);
-      if (path) generatePath.push(path);
+      else if (path) generatePath.push(path);
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);

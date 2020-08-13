@@ -19,6 +19,25 @@ tape('GeneratePath [cloudfront]', function(assert) {
   generatePath.end();
 });
 
+tape('GeneratePath with referer [cloudfront]', function(assert) {
+  var data = [];
+  var keepReferer = true;
+  var generatePath = reader.GeneratePath('cloudfront', keepReferer);
+  generatePath.on('data', function(d) {
+    data.push(d);
+  });
+  generatePath.on('end', function() {
+    assert.deepEqual(data[0], ['/a.json?option=1', 'https://www.mapbox.com/']);
+    assert.equal(data[1], '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123');
+    assert.equal(data.length, 2);
+    assert.end();
+  });
+  generatePath.write('2014-09-05	12:48:00	IAD53	33125	54.236.254.12	GET	d3eju24r2ptc5d.cloudfront.net	/a.json	200	https://www.mapbox.com/	FakeAgent	option=1	-	Miss	FAKE==	example.com	http	784	0.314\n');
+  generatePath.write('2016-04-14      02:40:16        DFW50   1771    108.223.176.206 GET     d3eju24r2ptc5d.cloudfront.net   /geocoding/v5/mapbox.places/2401%2520Gw%2520Loy%2520Rd%2520New%2520Market%252C%2520Tn%252037820.json        200     -       Mozilla/5.0%2520(iPhone;%2520CPU%2520iPhone%2520OS%25209_2%2520like%2520Mac%2520OS%2520X)%2520AppleWebKit/601.1.46%2520(KHTML,%2520like%2520Gecko)%2520Mobile/13C75 access_token=pk.abc.123       -       Miss    TbuZW6a2aUgeR9kBenr30jytUpJW5tSuv20Xv3n-smuTCqSdBjGpZQ==    a.tiles.mapbox.com      http    451     1.954   -       -       -       Miss\n');
+  generatePath.write('\n');
+  generatePath.end();
+});
+
 tape('GeneratePath [elb]', function(assert) {
   var data = [];
   var generatePath = reader.GeneratePath('lb');

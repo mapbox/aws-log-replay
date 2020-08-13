@@ -7,7 +7,6 @@ var parallel = require('parallel-stream');
 module.exports = {};
 module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
-module.exports.GetReferer = GetReferer;
 module.exports.SampleStream = SampleStream;
 
 /**
@@ -31,27 +30,35 @@ function cloudFrontDecode(path) {
  * Expects a line-oriented stream of CF log lines.
  * @param {string} type
  */
-function GeneratePath(type) {
+function GeneratePath(type, keepReferer = false) {
   var generatePath = new stream.Transform({ objectMode: true });
   generatePath._transform = function(line, enc, callback) {
     if (!line) return callback();
     if (Buffer.isBuffer(line)) line = line.toString('utf-8');
+    var path;
     if (type.toLowerCase() == 'cloudfront') {
       var parts = line.split(/\s+/g);
       if (parts.length > 7) {
         if (parts[11] && parts[11] !== '-') {
-          generatePath.push(cloudFrontDecode(parts[7] + '?' + parts[11]));
+          path = cloudFrontDecode(parts[7] + '?' + parts[11]);
         } else {
+          path = cloudFrontDecode(parts[7]);
+        }
+      } 
       // get Referer
       if (parts[9] && parts[9] !== '-') {
         var referer = parts[9];
       }
+      if (keepReferer && referer) {
+        generatePath.push([path, referer]);
+      } else {
+        generatePath.push(path);
       }
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);
       if (parts.length < 12) return callback();
-      var path = parts.length === 18 ? parts[12] : parts[13];
+      path = parts.length === 18 ? parts[12] : parts[13];
       path = url.parse(path).path;
       if (!path) return callback();
       generatePath.push(path);
@@ -73,8 +80,16 @@ function RequestStream(options) {
   options = options || {};
   if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
   if (!options.hwm) options.hwm = 100;
-  function transform(pathname, enc, callback) {
+  function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
+    var pathname, referer;
+    if (typeof data === 'object') {
+      pathname = data[0];
+      referer = data[1];
+      if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
+    } else {
+      pathname = data;
+    }
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 

@@ -29,6 +29,7 @@ function cloudFrontDecode(path) {
  * Transform stream for converting a CF log line into a path and querystring.
  * Expects a line-oriented stream of CF log lines.
  * @param {string} type
+ * @param {boolean} keepReferer - set to true if using cloudfront logs and you want to include the referer in the request
  */
 function GeneratePath(type, keepReferer = false) {
   var generatePath = new stream.Transform({ objectMode: true });
@@ -70,7 +71,6 @@ function GeneratePath(type, keepReferer = false) {
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
  * @param {string} options.strictSSL - Optional. If true (default), requires SSL/TLS certificates to be valid
- * @param {boolean} options.referer - Optional. If true, include referer from requests (cloudfront logs only)
  */
 function RequestStream(options) {
   options = options || {};

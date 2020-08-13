@@ -35,25 +35,21 @@ function GeneratePath(type, keepReferer = false) {
   generatePath._transform = function(line, enc, callback) {
     if (!line) return callback();
     if (Buffer.isBuffer(line)) line = line.toString('utf-8');
-    var path;
     if (type.toLowerCase() == 'cloudfront') {
       var parts = line.split(/\s+/g);
       if (parts.length > 7) {
         if (parts[11] && parts[11] !== '-') {
-          path = cloudFrontDecode(parts[7] + '?' + parts[11]);
+          var path = cloudFrontDecode(parts[7] + '?' + parts[11]);
         } else {
           path = cloudFrontDecode(parts[7]);
         }
       } 
       // get Referer
-      if (parts[9] && parts[9] !== '-') {
+      if (keepReferer && parts[9] && parts[9] !== '-') {
         var referer = parts[9];
       }
-      if (keepReferer && referer) {
-        generatePath.push([path, referer]);
-      } else {
-        generatePath.push(path);
-      }
+      if (path && referer) generatePath.push([path, referer]);
+      if (path) generatePath.push(path);
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);

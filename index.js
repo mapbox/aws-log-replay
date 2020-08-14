@@ -44,13 +44,13 @@ function GeneratePath(type, keepReferer = false) {
         } else {
           path = cloudFrontDecode(parts[7]);
         }
+        if (keepReferer && parts[9] && parts[9] !== '-') {
+          var referer = parts[9];
+        }
+        // get Referer
+        if (path && referer) generatePath.push([path, referer]);
+        else generatePath.push(path);
       } 
-      // get Referer
-      if (keepReferer && parts[9] && parts[9] !== '-') {
-        var referer = parts[9];
-      }
-      if (path && referer) generatePath.push([path, referer]);
-      else if (path) generatePath.push(path);
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);

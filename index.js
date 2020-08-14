@@ -29,8 +29,9 @@ function cloudFrontDecode(path) {
  * Transform stream for converting a CF log line into a path and querystring.
  * Expects a line-oriented stream of CF log lines.
  * @param {string} type
+ * @param {boolean} keepReferer - set to true if using cloudfront logs and you want to include the referer in the request
  */
-function GeneratePath(type) {
+function GeneratePath(type, keepReferer = false) {
   var generatePath = new stream.Transform({ objectMode: true });
   generatePath._transform = function(line, enc, callback) {
     if (!line) return callback();
@@ -39,16 +40,22 @@ function GeneratePath(type) {
       var parts = line.split(/\s+/g);
       if (parts.length > 7) {
         if (parts[11] && parts[11] !== '-') {
-          generatePath.push(cloudFrontDecode(parts[7] + '?' + parts[11]));
+          var path = cloudFrontDecode(parts[7] + '?' + parts[11]);
         } else {
-          generatePath.push(cloudFrontDecode(parts[7]));
+          path = cloudFrontDecode(parts[7]);
         }
-      }
+        if (keepReferer && parts[9] && parts[9] !== '-') {
+          var referer = parts[9];
+        }
+        // get Referer
+        if (path && referer) generatePath.push([path, referer]);
+        else generatePath.push(path);
+      } 
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);
       if (parts.length < 12) return callback();
-      var path = parts.length === 18 ? parts[12] : parts[13];
+      path = parts.length === 18 ? parts[12] : parts[13];
       path = url.parse(path).path;
       if (!path) return callback();
       generatePath.push(path);
@@ -69,23 +76,35 @@ function RequestStream(options) {
   options = options || {};
   if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
   if (!options.hwm) options.hwm = 100;
-
-  function transform(pathname, enc, callback) {
+  function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
-
+    var pathname, referer;
+    if (typeof data === 'object') {
+      pathname = data[0];
+      referer = data[1];
+      if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
+    } else {
+      pathname = data;
+    }
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
     var uri = url.parse(pathname, true);
     var requrl = options.baseurl + url.format(uri);
 
-    request({
+    var requestOptions = {
       agent: options.agent,
       strictSSL: options.strictSSL === false ? false : true,
       encoding: null,
       uri: requrl,
       time: true
-    }, (err, res, body) => {
+    };
+
+    if (referer) {
+      requestOptions.headers = { referer: referer };
+    }
+
+    request(requestOptions, (err, res, body) => {
       if (err) return callback(err);
       this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
       callback();

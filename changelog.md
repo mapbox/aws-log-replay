@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file. For change 
 
 --
 
+## 2.6.0 2020-08-13
+
+- Adds option to include referer in stream when generating a path
+- If referer header is passed in to RequestStream, will include referer in request
+
 ## 2.4.1 2018-01-26
 
 - Allow timestamps in url paths

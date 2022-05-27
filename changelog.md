@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file. For change 
 
 --
 
+# 2.6.1 2022-05-27
+- Bumped `requestretry` from 2.0.0 to 7.1.0
+
 ## 2.6.0 2020-08-13
 
 - Adds option to include referer in stream when generating a path

@@ -48,7 +48,7 @@ function GeneratePath(type, keepReferer = false) {
           var referer = parts[9];
         }
         // get Referer
-        if (path && referer) generatePath.push([path, referer]);
+        if (path && referer) generatePath.push([path, referer, type.toLowerCase()]);
         else generatePath.push(path);
       } 
     } else if (type.toLowerCase() == 'lb') {
@@ -57,8 +57,13 @@ function GeneratePath(type, keepReferer = false) {
       if (parts.length < 12) return callback();
       path = parts.length === 18 ? parts[12] : parts[13];
       path = url.parse(path).path;
+      const method = parts.length === 18 ? parts[11] : parts[12];
       if (!path) return callback();
-      generatePath.push(path);
+      // get request method
+      const allowedMethods = ['GET', 'HEAD'];
+      // usually it is stored as "GET, regex will help remove the non-alphabetical characters
+      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push([path, method.match(/[a-zA-Z]+/g)[0]], type.toLowerCase());
+      else generatePath.push(path);
     }
     callback();
   };
@@ -78,11 +83,15 @@ function RequestStream(options) {
   if (!options.hwm) options.hwm = 100;
   function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
-    var pathname, referer;
+    var pathname, referer, method;
     if (typeof data === 'object') {
       pathname = data[0];
-      referer = data[1];
-      if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
+      if (data[2] === 'cloudfront') {
+        referer = data[1];
+        if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
+      } else if (data[2] === 'lb') {
+        method = data[1];
+      }
     } else {
       pathname = data;
     }
@@ -101,7 +110,11 @@ function RequestStream(options) {
     };
 
     if (referer) {
-      requestOptions.headers = { referer: referer };
+      requestOptions.headers = { referer };
+    }
+
+    if (method) {
+      requestOptions.method = method;
     }
 
     request(requestOptions, (err, res, body) => {

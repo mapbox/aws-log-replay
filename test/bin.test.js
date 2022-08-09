@@ -37,7 +37,7 @@ tape('pathreplay', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.deepEqual(data, ['{"obj":"a"}\n', '{"obj":"b"}\n'], 'emits obj a, b');
+    assert.deepEqual(data.sort(), ['{"obj":"a"}\n', '{"obj":"b"}\n'], 'emits obj a, b');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
@@ -120,7 +120,7 @@ tape('generatepath [lb]', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.equal(data[0], '/a.json?option=1\n');
+    assert.equal(data[0], '/a.json?option=1,GET,lb\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });

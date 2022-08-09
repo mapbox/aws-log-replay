@@ -5,12 +5,12 @@
     "generatepath": "./bin/generatepath"
   },
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=14"
   },
   "name": "aws-log-replay",
   "license": "BSD-2-Clause",
   "author": "Mapbox",
-  "version": "2.6.1",
+  "version": "2.7.0-dev3",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
     "aws-sdk-mock": "^4.0.0",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "documentation": "2.0.x",
-    "eslint": "^3.11.1",
+    "eslint": "^4.19.1",
     "request": "^2.87.0",
     "tape": "3.5.x"
   },

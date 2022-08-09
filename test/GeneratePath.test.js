@@ -45,10 +45,10 @@ tape('GeneratePath [elb]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.equal(data[0], '/a.json?option=1');
-    assert.equal(data[1], '/b.json?option=1&other=2');
-    assert.equal(data[2], '/ham/sam?iam');
-    assert.equal(data[3], '/v1/thing/my.id?time=2017-05-31T22:05:32.562Z');
+    assert.deepEqual(data[0], ['/a.json?option=1', 'GET', 'lb']);
+    assert.deepEqual(data[1], ['/b.json?option=1&other=2', 'GET', 'lb']);
+    assert.deepEqual(data[2], '/ham/sam?iam');
+    assert.deepEqual(data[3], ['/v1/thing/my.id?time=2017-05-31T22:05:32.562Z', 'GET', 'lb']);
     assert.equal(data.length, 4);
     assert.end();
   });

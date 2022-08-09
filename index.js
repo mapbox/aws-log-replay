@@ -64,7 +64,6 @@ function GeneratePath(type, keepReferer = false) {
       // get request method
       // usually it is stored as "GET, regex will help remove the non-alphabetical characters
       if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push([path, method.match(/[a-zA-Z]+/g)[0], type.toLowerCase()]);
-      else generatePath.push(path);
     }
     callback();
   };

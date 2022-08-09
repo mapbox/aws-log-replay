@@ -121,10 +121,12 @@ tape('generatepath [lb]', function(assert) {
   });
   child.on('close', function(code) {
     assert.equal(data[0], '/a.json?option=1,GET,lb\n');
+    assert.equal(data[1], '/b.json?option=2,HEAD,lb\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
   child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 304 304 0 0 "GET http://green-eggs.com:80/a.json?option=1 HTTP/1.1" "Amazon CloudFront" - -\n');
+  child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 200 200 0 0 "HEAD http://green-eggs.com:80/b.json?option=2 HTTP/1.1" "Amazon CloudFront" - -\n');
   child.stdin.write('\n');
   child.stdin.end();
 });

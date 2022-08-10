@@ -9,6 +9,8 @@ module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
 module.exports.SampleStream = SampleStream;
 
+const allowedMethods = ['GET', 'HEAD'];
+
 /**
  * decode a path according to cloudfront character encoding spec
  * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
@@ -44,12 +46,19 @@ function GeneratePath(type, keepReferer = false) {
         } else {
           path = cloudFrontDecode(parts[7]);
         }
+        if (!path) return callback();
+
         if (keepReferer && parts[9] && parts[9] !== '-') {
           var referer = parts[9];
         }
-        // get Referer
-        if (path && referer) generatePath.push({ path, referer });
-        else generatePath.push({ path });
+
+        const method = parts[5];
+        // get Referer & method
+        if (method && allowedMethods.some((m) => method.includes(m))) {
+          const obj = { path, method };
+          if (referer) obj.referer = referer;
+          generatePath.push(obj);
+        } 
       } 
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
@@ -60,10 +69,9 @@ function GeneratePath(type, keepReferer = false) {
       const method = parts.length === 18 ? parts[11] : parts[12];
       if (!path) return callback();
 
-      const allowedMethods = ['GET', 'HEAD'];
       // get request method
       // usually it is stored as "GET, regex will help remove the non-alphabetical characters
-      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push({ path, method: method.match(/[a-zA-Z]+/g)[0], type: type.toLowerCase() });
+      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push({ path, method: method.match(/[a-zA-Z]+/g)[0] });
     }
     callback();
   };
@@ -83,15 +91,11 @@ function RequestStream(options) {
   if (!options.hwm) options.hwm = 100;
   function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
-    var pathname, referer, method;
-    if (typeof data === 'object') {
-      if (data['type'] === 'lb') {
-        method = data['method'];
-      } else {
-        referer = data['referer'];
-        if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
-      }
-    }
+    var pathname, referer;
+    const method = data['method'];
+
+    referer = data['referer'];
+    if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
   
     pathname = data['path'];
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');

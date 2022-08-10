@@ -95,9 +95,9 @@ tape('generatepath [cloudfront]', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.equal(data[0], '{ path: \'/a.json?option=1\' }\n');
-    assert.equal(data[1], '{ path: \'/b.json?option=2\' }\n');
-    assert.equal(data[2], '{ path: \'/c.json?option=2\' }\n');
+    assert.equal(data[0], '{ path: \'/a.json?option=1\', method: \'GET\' }\n');
+    assert.equal(data[1], '{ path: \'/b.json?option=2\', method: \'GET\' }\n');
+    assert.equal(data[2], '{ path: \'/c.json?option=2\', method: \'GET\' }\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
@@ -118,8 +118,8 @@ tape('generatepath [lb]', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.equal(data[0], '{ path: \'/a.json?option=1\', method: \'GET\', type: \'lb\' }\n');
-    assert.equal(data[1], '{ path: \'/b.json?option=2\', method: \'HEAD\', type: \'lb\' }\n');
+    assert.equal(data[0], '{ path: \'/a.json?option=1\', method: \'GET\' }\n');
+    assert.equal(data[1], '{ path: \'/b.json?option=2\', method: \'HEAD\' }\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });

@@ -8,8 +8,8 @@ tape('GeneratePath [cloudfront]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.deepEqual(data[0], { path: '/a.json?option=1' });
-    assert.deepEqual(data[1], { path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
     assert.equal(data.length, 2);
     assert.end();
   });
@@ -27,8 +27,8 @@ tape('GeneratePath with referer [cloudfront]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.deepEqual(data[0], { path: '/a.json?option=1', referer: 'https://www.mapbox.com/' });
-    assert.deepEqual(data[1], { path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1', referer: 'https://www.mapbox.com/' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
     assert.equal(data.length, 2);
     assert.end();
   });
@@ -45,10 +45,10 @@ tape('GeneratePath [elb]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1', type: 'lb' });
-    assert.deepEqual(data[1], { method: 'GET', path: '/b.json?option=1&other=2', type: 'lb' });
-    assert.deepEqual(data[2], { method: 'HEAD', path: '/ham/sam?iam', type: 'lb' });
-    assert.deepEqual(data[3], { method: 'GET', path: '/v1/thing/my.id?time=2017-05-31T22:05:32.562Z', type: 'lb' });
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/b.json?option=1&other=2' });
+    assert.deepEqual(data[2], { method: 'HEAD', path: '/ham/sam?iam' });
+    assert.deepEqual(data[3], { method: 'GET', path: '/v1/thing/my.id?time=2017-05-31T22:05:32.562Z' });
     assert.equal(data.length, 4);
     assert.end();
   });

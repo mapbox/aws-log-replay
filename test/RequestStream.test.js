@@ -37,7 +37,7 @@ tape('RequestStream [concurrency]', function(assert) {
     assert.equal(req, count);
   }, 1000);
   for (var i = 0; i < 10; i++) {
-    reqstream.write('/a.json?option=1\n');
+    reqstream.write({ path: '/a.json?option=1\n' });
   }
   setTimeout(function() {
     clearInterval(j);
@@ -72,10 +72,10 @@ tape('RequestStream', function(assert) {
     assert.deepEqual(data.map(function(d) { return d.obj; }).sort(), ['a', 'b'], 'emits objects a, b');
     assert.end();
   });
-  reqstream.write('/a.json?option=1\n');
-  reqstream.write('/b.json?option=2\n');
-  reqstream.write('/c.json?option=2\n');
-  reqstream.write('\n');
+  reqstream.write({ path: '/a.json?option=1\n' });
+  reqstream.write({ path: '/b.json?option=2\n' });
+  reqstream.write({ path: '/c.json?option=2\n' });
+  reqstream.write({ path: '\n' });
   reqstream.end();
 });
 
@@ -93,10 +93,10 @@ tape('RequestStream close', function(assert) {
 
   reqstream.close();
   assert.ok(reqstream._closed, 'marked stream as closed');
-  reqstream.write('/a.json?option=1\n');
-  reqstream.write('/b.json?option=2\n');
-  reqstream.write('/c.json?option=2\n');
-  reqstream.write('\n');
+  reqstream.write({ path: '/a.json?option=1\n' });
+  reqstream.write({ path: '/b.json?option=2\n' });
+  reqstream.write({ path: '/c.json?option=2\n' });
+  reqstream.write({ path: '\n' });
   reqstream.end();
 });
 

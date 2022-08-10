@@ -48,8 +48,8 @@ function GeneratePath(type, keepReferer = false) {
           var referer = parts[9];
         }
         // get Referer
-        if (path && referer) generatePath.push([path, referer]);
-        else generatePath.push(path);
+        if (path && referer) generatePath.push({ path, referer });
+        else generatePath.push({ path });
       } 
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
@@ -63,7 +63,7 @@ function GeneratePath(type, keepReferer = false) {
       const allowedMethods = ['GET', 'HEAD'];
       // get request method
       // usually it is stored as "GET, regex will help remove the non-alphabetical characters
-      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push([path, method.match(/[a-zA-Z]+/g)[0], type.toLowerCase()]);
+      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push({ path, method: method.match(/[a-zA-Z]+/g)[0], type: type.toLowerCase() });
     }
     callback();
   };
@@ -85,16 +85,15 @@ function RequestStream(options) {
     if (this._closed) return setImmediate(callback);
     var pathname, referer, method;
     if (typeof data === 'object') {
-      pathname = data[0];
-      if (data[2] === 'lb') {
-        method = data[1];
+      if (data['type'] === 'lb') {
+        method = data['method'];
       } else {
-        referer = data[1];
+        referer = data['referer'];
         if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
       }
-    } else {
-      pathname = data;
     }
+  
+    pathname = data['path'];
     if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 

@@ -7,7 +7,7 @@
   "engines": {
     "node": ">=14"
   },
-  "name": "@mapbox/aws-log-replay",
+  "name": "aws-log-replay",
   "license": "BSD-2-Clause",
   "author": "Mapbox",
   "version": "2.7.0-dev6",

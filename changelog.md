@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file. For change 
 
 --
 
-# 2.6.1 2022-05-27
+## 2.7.0 2022-08-11
+- Include request method in stream when generating a path
+- Request method will be used if passed to RequestStream. Only `GET` or `HEAD` requests are allowed to be replayed
+
+## 2.6.1 2022-05-27
 - Bumped `requestretry` from 2.0.0 to 7.1.0
 
 ## 2.6.0 2020-08-13

@@ -98,7 +98,7 @@ function RequestStream(options) {
     if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
   
     pathname = data['path'];
-    if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
+    if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
     var uri = url.parse(pathname, true);

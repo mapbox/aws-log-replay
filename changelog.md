@@ -5,8 +5,8 @@ All notable changes to this project will be documented in this file. For change 
 
 --
 
-## 2.7.0 2022-08-11
-- Include request method in stream when generating a path
+## 3.0.0 2022-08-11
+- Include request method in stream when generating a path. This will introduce a breaking change. More info in the [#55](https://github.com/mapbox/aws-log-replay/pull/55) PR description 
 - Request method will be used if passed to RequestStream. Only `GET` or `HEAD` requests are allowed to be replayed
 
 ## 2.6.1 2022-05-27

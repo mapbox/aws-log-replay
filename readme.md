@@ -8,7 +8,15 @@ This project uses the AWS JavaScript SDK: you will need to [configure your own c
 
 ## generatepath
 
-Takes different types of logs as input and streams only the path to `stdout`. Supported types include "cloudfront" for CloudFront logs and "lb" for ELB Classic or ALB logs.
+Takes different types of logs as input and streams  an object to `stdout`. Format of the output:
+```js
+{
+  "path": "/a.json?option=1", 
+  "method": "GET", // can be GET or HEAD
+  "referer": "Referer" // for 'cloudfront' type only
+}
+```
+Supported types include "cloudfront" for CloudFront logs and "lb" for ELB Classic or ALB logs.
 
 ```sh
 Usage: generatepath <type>

@@ -8,8 +8,8 @@ tape('GeneratePath [cloudfront]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.equal(data[0], '/a.json?option=1');
-    assert.equal(data[1], '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123');
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
     assert.equal(data.length, 2);
     assert.end();
   });
@@ -27,8 +27,8 @@ tape('GeneratePath with referer [cloudfront]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.deepEqual(data[0], ['/a.json?option=1', 'https://www.mapbox.com/']);
-    assert.equal(data[1], '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123');
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1', referer: 'https://www.mapbox.com/' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/geocoding/v5/mapbox.places/2401%20Gw%20Loy%20Rd%20New%20Market%2C%20Tn%2037820.json?access_token=pk.abc.123' });
     assert.equal(data.length, 2);
     assert.end();
   });
@@ -45,10 +45,10 @@ tape('GeneratePath [elb]', function(assert) {
     data.push(d);
   });
   generatePath.on('end', function() {
-    assert.equal(data[0], '/a.json?option=1');
-    assert.equal(data[1], '/b.json?option=1&other=2');
-    assert.equal(data[2], '/ham/sam?iam');
-    assert.equal(data[3], '/v1/thing/my.id?time=2017-05-31T22:05:32.562Z');
+    assert.deepEqual(data[0], { method: 'GET', path: '/a.json?option=1' });
+    assert.deepEqual(data[1], { method: 'GET', path: '/b.json?option=1&other=2' });
+    assert.deepEqual(data[2], { method: 'HEAD', path: '/ham/sam?iam' });
+    assert.deepEqual(data[3], { method: 'GET', path: '/v1/thing/my.id?time=2017-05-31T22:05:32.562Z' });
     assert.equal(data.length, 4);
     assert.end();
   });
@@ -56,6 +56,7 @@ tape('GeneratePath [elb]', function(assert) {
   generatePath.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 200 200 0 0 "GET http://green-eggs.com:666/b.json?option=1&other=2 HTTP/1.1" "Amazon CloudFront" - -');
   generatePath.write('us-east-1.elb.amazonaws.com:666/ HTTP/1.1" "Amazon Route 53 Health Check Service; ref:000-000-0000; report http://green.eggs" ABCD-EFGH TLSv1.2');
   generatePath.write('https 2016-09-25T07:15:01.253924Z app/api-green-eggs/1234 00.000.000.00:00000 00.0.0.000:00000 0.000 0.000 0.000 000 000 0000 000 "POST https://green.eggs.com:000/ham/sam?iam HTTP/1.1" "(null)/0.0.0/000 greeneggsandham/0.0" ABCDE-ABC-ABC000-ABC TLSv1 greeneggsandhamsamiam');
+  generatePath.write('https 2016-09-25T07:15:01.253924Z app/api-green-eggs/1234 00.000.000.00:00000 00.0.0.000:00000 0.000 0.000 0.000 000 000 0000 000 "HEAD https://green.eggs.com:000/ham/sam?iam HTTP/1.1" "(null)/0.0.0/000 greeneggsandham/0.0" ABCDE-ABC-ABC000-ABC TLSv1 greeneggsandhamsamiam');
   generatePath.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 304 304 0 0 "GET http://api.example.com:80/v1/thing/my.id?time=2017-05-31T22:05:32.562Z HTTP/1.1" "Amazon CloudFront" - -');
   generatePath.write('\n');
   generatePath.end();

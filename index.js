@@ -9,6 +9,8 @@ module.exports.RequestStream = RequestStream;
 module.exports.GeneratePath = GeneratePath;
 module.exports.SampleStream = SampleStream;
 
+const allowedMethods = ['GET', 'HEAD'];
+
 /**
  * decode a path according to cloudfront character encoding spec
  * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
@@ -21,7 +23,7 @@ function cloudFrontDecode(path) {
     if ((code < 32) || (code > 127) || (whitelist.indexOf(hex) !== -1))
       return String.fromCharCode(code);
     else
-            return match;
+      return match;
   });
 }
 
@@ -44,12 +46,19 @@ function GeneratePath(type, keepReferer = false) {
         } else {
           path = cloudFrontDecode(parts[7]);
         }
+        if (!path) return callback();
+
         if (keepReferer && parts[9] && parts[9] !== '-') {
           var referer = parts[9];
         }
-        // get Referer
-        if (path && referer) generatePath.push([path, referer]);
-        else generatePath.push(path);
+
+        const method = parts[5];
+        // get Referer & method
+        if (method && allowedMethods.some((m) => method.includes(m))) {
+          const obj = { path, method };
+          if (referer) obj.referer = referer;
+          generatePath.push(obj);
+        } 
       } 
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
@@ -57,8 +66,12 @@ function GeneratePath(type, keepReferer = false) {
       if (parts.length < 12) return callback();
       path = parts.length === 18 ? parts[12] : parts[13];
       path = url.parse(path).path;
+      const method = parts.length === 18 ? parts[11] : parts[12];
       if (!path) return callback();
-      generatePath.push(path);
+
+      // get request method
+      // usually it is stored as "GET, regex will help remove the non-alphabetical characters
+      if (method && allowedMethods.some((m) => method.includes(m))) generatePath.push({ path, method: method.match(/[a-zA-Z]+/g)[0] });
     }
     callback();
   };
@@ -79,14 +92,13 @@ function RequestStream(options) {
   function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
     var pathname, referer;
-    if (typeof data === 'object') {
-      pathname = data[0];
-      referer = data[1];
-      if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
-    } else {
-      pathname = data;
-    }
-    if (typeof pathname !== 'string') pathname = pathname.toString('utf8');
+    const method = data['method'];
+
+    referer = data['referer'];
+    if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
+  
+    pathname = data['path'];
+    if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
     var uri = url.parse(pathname, true);
@@ -101,7 +113,11 @@ function RequestStream(options) {
     };
 
     if (referer) {
-      requestOptions.headers = { referer: referer };
+      requestOptions.headers = { referer };
+    }
+
+    if (method) {
+      requestOptions.method = method;
     }
 
     request(requestOptions, (err, res, body) => {

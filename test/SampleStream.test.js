@@ -20,7 +20,7 @@ function testFunc(r, f, expected, t) {
   });
 
   for (var k = 0; k < 1000; k++) {
-        // each of these is 9 records long
+    // each of these is 9 records long
     splitStream.write(fs.readFileSync(path.join(__dirname + '/fixtures/AAAAAAAAAAAAAA.2015-10-19-17.e5b6526a'), 'utf8'));
   }
   splitStream.end();
@@ -33,5 +33,5 @@ for (var rate = 1; rate < 10; rate++) {
 
 var expectedFiltered = [299, 607, 904, 1218, 1509, 1788, 2085, 2384, 2716];
 for (rate = 1; rate < 10; rate++) {
-  tape('filtered, sample rate ' + (rate * 0.1).toFixed(1), testFunc.bind(null, rate, 'a\.json', expectedFiltered[rate - 1]));
+  tape('filtered, sample rate ' + (rate * 0.1).toFixed(1), testFunc.bind(null, rate, 'a.json', expectedFiltered[rate - 1]));
 }

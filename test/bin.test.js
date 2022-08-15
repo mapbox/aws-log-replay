@@ -37,14 +37,13 @@ tape('pathreplay', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.deepEqual(data, ['{"obj":"a"}\n', '{"obj":"b"}\n'], 'emits obj a, b');
+    assert.deepEqual(data.sort(), ['{"obj":"a"}\n', '{"obj":"b"}\n'], 'emits obj a, b');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
-  child.stdin.write('/a.json\n');
-  child.stdin.write('/b.json\n');
-  child.stdin.write('/c.json\n');
-  child.stdin.write('\n');
+  child.stdin.write(`${JSON.stringify({ path: '/a.json\n' })}\n`);
+  child.stdin.write(`${JSON.stringify({ path: '/b.json\n' })}\n`);
+  child.stdin.write(`${JSON.stringify({ path: '/c.json\n' })}`);
   child.stdin.end();
 });
 
@@ -70,8 +69,7 @@ tape('pathreplay [concurrency arg]', function(assert) {
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
-  child.stdin.write('/a.json\n');
-  child.stdin.write('\n');
+  child.stdin.write(JSON.stringify({ path: '/a.json\n' }));
   child.stdin.end();
 });
 
@@ -97,9 +95,9 @@ tape('generatepath [cloudfront]', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.equal(data[0], '/a.json?option=1\n');
-    assert.equal(data[1], '/b.json?option=2\n');
-    assert.equal(data[2], '/c.json?option=2\n');
+    assert.equal(data[0], '{ path: \'/a.json?option=1\', method: \'GET\' }\n');
+    assert.equal(data[1], '{ path: \'/b.json?option=2\', method: \'GET\' }\n');
+    assert.equal(data[2], '{ path: \'/c.json?option=2\', method: \'GET\' }\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
@@ -120,11 +118,13 @@ tape('generatepath [lb]', function(assert) {
     assert.ifError(data);
   });
   child.on('close', function(code) {
-    assert.equal(data[0], '/a.json?option=1\n');
+    assert.equal(data[0], '{ path: \'/a.json?option=1\', method: \'GET\' }\n');
+    assert.equal(data[1], '{ path: \'/b.json?option=2\', method: \'HEAD\' }\n');
     assert.equal(code, 0, 'exits 0');
     assert.end();
   });
   child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 304 304 0 0 "GET http://green-eggs.com:80/a.json?option=1 HTTP/1.1" "Amazon CloudFront" - -\n');
+  child.stdin.write('2016-02-01T19:04:59.488164Z eggs-VPC 000.000.000.00:00000 00.0.00.00:00 0.000024 0.006806 0.00002 200 200 0 0 "HEAD http://green-eggs.com:80/b.json?option=2 HTTP/1.1" "Amazon CloudFront" - -\n');
   child.stdin.write('\n');
   child.stdin.end();
 });

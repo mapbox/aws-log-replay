@@ -148,8 +148,7 @@ tape('RequestStream close', function(assert) {
     baseurl: 'http://localhost:8888' // all requests ought to fail
   });
 
-  reqstream.on('error', function(err) { assert.ifError(err,
-    'should not fail'); });
+  reqstream.on('error', function(err) { assert.ifError(err, 'should not fail'); });
   reqstream.on('finish', function() {
     assert.equal(count, 0, 'no requests were made');
     assert.end();

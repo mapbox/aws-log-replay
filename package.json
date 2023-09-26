@@ -5,7 +5,7 @@
     "generatepath": "./bin/generatepath"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "name": "@mapbox/aws-log-replay",
   "license": "BSD-2-Clause",
@@ -13,13 +13,9 @@
   "version": "4.0.0-dev.2",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
-    "aws-sdk-mock": "^4.0.0",
     "got": "^11.8.6",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.8",
     "parallel-stream": "^1.1.2",
-    "queue-async": "^1.2.1",
-    "s3scan": "^0.2.3",
-    "s3urls": "^1.5.2",
     "split": "^1.0.1"
   },
   "scripts": {
@@ -27,9 +23,7 @@
     "pretest": "eslint test bin index.js"
   },
   "devDependencies": {
-    "documentation": "2.0.x",
     "eslint": "^4.19.1",
-    "request": "^2.87.0",
     "tape": "3.5.x"
   },
   "main": "index.js",

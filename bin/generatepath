@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-var keepalive = require('agentkeepalive');
+var { GeneratePath } = require('..');
 var split = require('split');
-var reader = require('..');
 
 var type = process.argv[2];
 if (!type || (type !== 'cloudfront' && type !== 'lb')) {
@@ -11,7 +10,7 @@ if (!type || (type !== 'cloudfront' && type !== 'lb')) {
   process.exit(1);
 }
 
-var generatePath = reader.GeneratePath(type);
+var generatePath = GeneratePath(type);
 process.stdin
     .pipe(split())
     .pipe(generatePath)

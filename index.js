@@ -105,7 +105,6 @@ function RequestStream(options) {
 
     var gotOptions = {
       method: method || 'GET',
-      agent: options.agent,
       prefixUrl: options.baseurl,
       https: { 
         rejectUnauthorized: options.strictSSL === false ? false : true
@@ -115,6 +114,14 @@ function RequestStream(options) {
       retry: { limit: 5 },
       throwHttpErrors: false
     };
+
+    if (options.agent) {
+      if (options.agent?.protocol?.includes('https')) {
+        gotOptions.agent = { https: options.agent };
+      } else {
+        gotOptions.agent = { http: options.agent };
+      }
+    }
 
     if (referer) {
       gotOptions.headers = { referer };

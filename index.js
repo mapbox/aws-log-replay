@@ -101,7 +101,8 @@ function RequestStream(options) {
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
-    var uri = url.parse(pathname, true);
+    // replace all potential empty space characters with standard space character
+    var uri = url.parse(pathname.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/, ' '), true);
     var requrl = options.baseurl + url.format(uri);
 
     var requestOptions = {

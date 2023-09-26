@@ -79,6 +79,69 @@ tape('RequestStream', function(assert) {
   reqstream.end();
 });
 
+tape('RequestStream whitespace utf8 characters', function(assert) {
+  server.reset();
+  var logs = [];
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999',
+    hwm: 3
+  });
+  reqstream.on('data', function(d) {
+    logs.push(d.url);
+  });
+  reqstream.on('end', function() {
+    assert.equal(count, 21);
+    assert.deepEqual(logs, [
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM',
+      'http://localhost:9999/a.json?q=12:30%20PM'
+    ]);
+    assert.end();
+  });
+
+  // https://jkorpela.fi/chars/spaces.html
+  reqstream.write({ path: '/a.json?q=12:30 PM\n' });      // space (visual)
+  reqstream.write({ path: '/a.json?q=12:30\u0020PM\n' }); // space (utf8)
+  reqstream.write({ path: '/a.json?q=12:30\u00A0PM\n' }); // no-break space
+  reqstream.write({ path: '/a.json?q=12:30 PM\n' });      // narrow no-break space (visual)
+  reqstream.write({ path: '/a.json?q=12:30\u202FPM\n' }); // narrow no-break space (utf8)
+  reqstream.write({ path: '/a.json?q=12:30\u1680PM\n' }); // ogham space mark
+  reqstream.write({ path: '/a.json?q=12:30\u180EPM\n' }); // mongolian vowel separator
+  reqstream.write({ path: '/a.json?q=12:30\u2000PM\n' }); // en quad
+  reqstream.write({ path: '/a.json?q=12:30\u2001PM\n' }); // em quad
+  reqstream.write({ path: '/a.json?q=12:30\u2002PM\n' }); // en space
+  reqstream.write({ path: '/a.json?q=12:30\u2003PM\n' }); // em space
+  reqstream.write({ path: '/a.json?q=12:30\u2004PM\n' }); // three-per-em space
+  reqstream.write({ path: '/a.json?q=12:30\u2005PM\n' }); // four-per-em space
+  reqstream.write({ path: '/a.json?q=12:30\u2006PM\n' }); // six-per-em space
+  reqstream.write({ path: '/a.json?q=12:30\u2007PM\n' }); // figure space
+  reqstream.write({ path: '/a.json?q=12:30\u2008PM\n' }); // punctuation space
+  reqstream.write({ path: '/a.json?q=12:30\u2009PM\n' }); // thin space
+  reqstream.write({ path: '/a.json?q=12:30\u200APM\n' }); // hair space
+  reqstream.write({ path: '/a.json?q=12:30\u200BPM\n' }); // zero width space
+  reqstream.write({ path: '/a.json?q=12:30\u205FPM\n' }); // medium mathematical space
+  reqstream.write({ path: '/a.json?q=12:30\uFEFFPM\n' }); // zero width no-break space
+  reqstream.end();
+});
+
 tape('RequestStream close', function(assert) {
   server.reset();
   var reqstream = reader.RequestStream({

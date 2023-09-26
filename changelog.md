@@ -1,9 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
-## Unreleased
-
---
+## 4.0.0 (Unreleased)
+- Released under the `@mapbox/aws-log-replay` namespace.
+- Replace `requestretry` with `got` for the HTTP client [#57](https://github.com/mapbox/aws-log-replay/pull/57)
+- Test on Node 16 and 18
 
 ## 3.0.0 2022-08-11
 - Include request method in stream when generating a path. This will introduce a breaking change. More info in the [#55](https://github.com/mapbox/aws-log-replay/pull/55) PR description 

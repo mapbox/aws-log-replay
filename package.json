@@ -14,6 +14,7 @@
   "dependencies": {
     "agentkeepalive": "^3.5.1",
     "aws-sdk-mock": "^4.0.0",
+    "got": "^11.8.6",
     "minimist": "^1.2.0",
     "parallel-stream": "^1.1.2",
     "queue-async": "^1.2.1",

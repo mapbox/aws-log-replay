@@ -1,4 +1,4 @@
-var request = require('requestretry');
+var got = require('got');
 var url = require('url');
 var stream = require('stream');
 var crypto = require('crypto');
@@ -101,30 +101,38 @@ function RequestStream(options) {
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
-    var uri = url.parse(pathname, true);
-    var requrl = options.baseurl + url.format(uri);
+    var url = new URL(pathname, options.baseurl);
 
-    var requestOptions = {
+    var gotOptions = {
+      method: method || 'GET',
       agent: options.agent,
-      strictSSL: options.strictSSL === false ? false : true,
-      encoding: null,
-      uri: requrl,
-      time: true
+      prefixUrl: options.baseurl,
+      https: { 
+        rejectUnauthorized: options.strictSSL === false ? false : true
+      },
+      responseType: 'buffer',
+      time: true,
+      retry: { limit: 5 },
+      throwHttpErrors: false
     };
 
     if (referer) {
-      requestOptions.headers = { referer };
+      gotOptions.headers = { referer };
     }
 
-    if (method) {
-      requestOptions.method = method;
-    }
-
-    request(requestOptions, (err, res, body) => {
-      if (err) return callback(err);
-      this.push({ url: requrl, elapsedTime: res.elapsedTime, statusCode: res.statusCode, body: body });
-      callback();
-    });
+    got(url, gotOptions)
+      .then(({ statusCode, body, timings }) => {
+        this.push({ 
+          url: url.toString(), 
+          elapsedTime: timings.phases.total, 
+          statusCode, 
+          body
+        });
+        callback();
+      })
+      .catch((error) => {
+        return callback(error);
+      });
   }
 
   var requestStream = parallel.transform(transform, { concurrency: options.hwm, objectMode: true });

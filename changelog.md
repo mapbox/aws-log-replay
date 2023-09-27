@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. For change 
 - Replace `requestretry` with `got` for the HTTP client [#57](https://github.com/mapbox/aws-log-replay/pull/57)
 - Test on Node 16 and 18
 - Remove unused dependencies
+- Use github actions for running tests
 
 ## 3.0.0 2022-08-11
 - Include request method in stream when generating a path. This will introduce a breaking change. More info in the [#55](https://github.com/mapbox/aws-log-replay/pull/55) PR description 

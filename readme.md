@@ -1,7 +1,5 @@
 # aws-log-replay
 
-[![Build Status](https://travis-ci.com/mapbox/aws-log-replay.svg?branch=master)](https://travis-ci.com/mapbox/aws-log-replay)
-
 ```
 npm i @mapbox/aws-log-replay
 ```

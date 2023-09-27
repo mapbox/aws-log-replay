@@ -116,7 +116,7 @@ function RequestStream(options) {
     };
 
     if (options.agent) {
-      if (options.agent?.protocol?.includes('https')) {
+      if (options.agent.protocol.includes('https')) {
         gotOptions.agent = { https: options.agent };
       } else {
         gotOptions.agent = { http: options.agent };
@@ -166,18 +166,18 @@ function SampleStream(options) {
   var sampleStream = new stream.Transform({ objectMode: true });
   sampleStream.count = 0;
   sampleStream.threshold = Math.round(parseFloat(options.rate) * Math.pow(2, 16));
-  if (options.filter) sampleStream.filter = new RegExp(options.filter);
+  if (options.filter) {
+    sampleStream.filterFunction = new RegExp(options.filter);
+  }
   sampleStream._transform = function(line, enc, callback) {
     if (!line) return callback();
-
-    if ((sampleStream.filter) && (!sampleStream.filter.test(line)))
-      return callback();
-
+    if (sampleStream.filterFunction && !sampleStream.filterFunction.test(line)) return callback();
+    
     var hash = crypto.createHash('md5').update('cloudfront-log-read-salt-' + sampleStream.count).digest().readUInt16LE(0);
     if (hash < sampleStream.threshold)
       sampleStream.push(line);
     sampleStream.count++;
-
+    
     callback();
   };
 

@@ -1,6 +1,10 @@
 # aws-log-replay
 
-[![Build Status](https://travis-ci.org/mapbox/aws-log-replay.svg?branch=master)](https://travis-ci.org/mapbox/aws-log-replay)
+[![Build Status](https://travis-ci.com/mapbox/aws-log-replay.svg?branch=master)](https://travis-ci.com/mapbox/aws-log-replay)
+
+```
+npm i @mapbox/aws-log-replay
+```
 
 Transform and replay a stream of AWS CloudFront, ELB Classic, or ALB logs. You can use [s3scan](https://github.com/mapbox/s3scan) to easily stream logs into these tools.
 

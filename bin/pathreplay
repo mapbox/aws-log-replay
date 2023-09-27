@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+var { RequestStream } = require('..');
 var keepalive = require('agentkeepalive');
 var split = require('split');
-var reader = require('..');
 var stream = require('stream');
 var args = require('minimist')(process.argv.slice(2));
 
@@ -27,7 +27,7 @@ transformStream._transform = function(line, enc, callback) {
     callback();
 };
 
-var reqStream = reader.RequestStream({ baseurl: baseurl, agent: agent, hwm: hwm });
+var reqStream = RequestStream({ baseurl: baseurl, agent: agent, hwm: hwm });
 process.stdin
     .pipe(split())
     .pipe(transformStream)

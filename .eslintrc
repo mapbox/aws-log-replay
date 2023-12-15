@@ -20,5 +20,8 @@
       "module": true,
       "require": true
   },
+  "parserOptions": {
+    "ecmaVersion": 9
+  },
   "extends": "eslint:recommended"
 }

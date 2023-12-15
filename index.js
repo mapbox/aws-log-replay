@@ -129,7 +129,7 @@ function RequestStream(options) {
     }
 
     if(options.headers) {
-      gotOptions.heders = {...gotOptions.headers, ...options.headers}
+      gotOptions.heders = { ...gotOptions.headers, ...options.headers };
     }
 
     got(url, gotOptions)

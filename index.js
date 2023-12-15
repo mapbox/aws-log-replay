@@ -84,6 +84,7 @@ function GeneratePath(type, keepReferer = false) {
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
  * @param {string} options.strictSSL - Optional. If true (default), requires SSL/TLS certificates to be valid
+ * @param {object} options.headers - Optional. Headers to applied to requests
  */
 function RequestStream(options) {
   options = options || {};
@@ -125,6 +126,10 @@ function RequestStream(options) {
 
     if (referer) {
       gotOptions.headers = { referer };
+    }
+
+    if(options.headers) {
+      gotOptions.heders = {...gotOptions.headers, ...options.headers}
     }
 
     got(url, gotOptions)

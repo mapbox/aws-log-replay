@@ -1,7 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
-## 4.0.0 (Unreleased)
+## 4.1.0
+- Adds option to include given headers in requests
+
+## 4.0.0
 - Released under the `@mapbox/aws-log-replay` namespace.
 - Replace `requestretry` with `got` for the HTTP client [#57](https://github.com/mapbox/aws-log-replay/pull/57)
 - Test on Node 16 and 18

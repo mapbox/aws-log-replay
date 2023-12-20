@@ -129,7 +129,9 @@ function RequestStream(options) {
     }
 
     if(options.headers) {
+      console.log(`Headers before merge ${gotOptions.headers}`);
       gotOptions.heders = { ...gotOptions.headers, ...options.headers };
+      console.log(`Headers after merge ${gotOptions.headers}`);
     }
 
     got(url, gotOptions)

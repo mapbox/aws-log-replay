@@ -132,10 +132,10 @@ function RequestStream(options) {
       console.log(`Headers before merge ${gotOptions.headers}`);
       console.log(`Should apply headers:  ${JSON.stringify(options.headers)}`);
       if (gotOptions.headers){
-        gotOptions.heders = { ...gotOptions.headers, ...options.headers };
+        gotOptions.headers = { ...gotOptions.headers, ...options.headers };
       }
       else{
-        gotOptions.heders = options.headers;
+        gotOptions.headers = options.headers;
       }
       console.log(`Headers after merge ${gotOptions.headers}`);
     }

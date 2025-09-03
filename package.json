@@ -10,12 +10,13 @@
   "name": "@mapbox/aws-log-replay",
   "license": "BSD-2-Clause",
   "author": "Mapbox",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
     "got": "^11.8.6",
     "minimist": "^1.2.8",
     "parallel-stream": "^1.1.2",
+    "safe-regex": "^2.1.1",
     "split": "^1.0.1"
   },
   "scripts": {

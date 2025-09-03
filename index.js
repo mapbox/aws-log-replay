@@ -3,6 +3,7 @@ var url = require('url');
 var stream = require('stream');
 var crypto = require('crypto');
 var parallel = require('parallel-stream');
+const safeRegex = require('safe-regex');
 
 module.exports = {};
 module.exports.RequestStream = RequestStream;
@@ -58,8 +59,8 @@ function GeneratePath(type, keepReferer = false) {
           const obj = { path, method };
           if (referer) obj.referer = referer;
           generatePath.push(obj);
-        } 
-      } 
+        }
+      }
     } else if (type.toLowerCase() == 'lb') {
       if (line.indexOf('Amazon Route 53 Health Check Service') > -1) return callback();
       parts = line.split(/\s+/g);
@@ -97,7 +98,7 @@ function RequestStream(options) {
 
     referer = data['referer'];
     if (referer && typeof referer !== 'string') referer = referer.toString('utf8');
-  
+
     pathname = data['path'];
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
@@ -107,7 +108,7 @@ function RequestStream(options) {
     var gotOptions = {
       method: method || 'GET',
       prefixUrl: options.baseurl,
-      https: { 
+      https: {
         rejectUnauthorized: options.strictSSL === false ? false : true
       },
       responseType: 'buffer',
@@ -134,10 +135,10 @@ function RequestStream(options) {
 
     got(url, gotOptions)
       .then(({ statusCode, body, timings }) => {
-        this.push({ 
-          url: url.toString(), 
-          elapsedTime: timings.phases.total, 
-          statusCode, 
+        this.push({
+          url: url.toString(),
+          elapsedTime: timings.phases.total,
+          statusCode,
           body
         });
         callback();
@@ -172,17 +173,22 @@ function SampleStream(options) {
   sampleStream.count = 0;
   sampleStream.threshold = Math.round(parseFloat(options.rate) * Math.pow(2, 16));
   if (options.filter) {
+    if (!safeRegex(options.filter)) throw new Error('Unsafe regex provided');
     sampleStream.filterFunction = new RegExp(options.filter);
   }
   sampleStream._transform = function(line, enc, callback) {
     if (!line) return callback();
+    // Check if line is larger than 1KB
+    if (Buffer.byteLength(line, 'utf8') > 1024) {
+      return callback(new Error('Log line exceeds 1KB'));
+    }
     if (sampleStream.filterFunction && !sampleStream.filterFunction.test(line)) return callback();
-    
+
     var hash = crypto.createHash('md5').update('cloudfront-log-read-salt-' + sampleStream.count).digest().readUInt16LE(0);
     if (hash < sampleStream.threshold)
       sampleStream.push(line);
     sampleStream.count++;
-    
+
     callback();
   };
 

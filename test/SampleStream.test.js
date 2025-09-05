@@ -35,3 +35,29 @@ var expectedFiltered = [299, 607, 904, 1218, 1509, 1788, 2085, 2384, 2716];
 for (rate = 1; rate < 10; rate++) {
   tape('filtered, sample rate ' + (rate * 0.1).toFixed(1), testFunc.bind(null, rate, 'a.json', expectedFiltered[rate - 1]));
 }
+
+tape('throws error for unsafe regex', function(t) {
+  try {
+    reader.SampleStream({ rate: 0.5, filter: /(a+)+b/ });
+    t.fail('Should have thrown for unsafe regex');
+  } catch (err) {
+    t.equal(err.message, 'Unsafe regex provided', 'throws correct error for unsafe regex');
+    t.end();
+  }
+});
+
+tape('throws error for log lines larger than 1KB', function(t) {
+  var sample = reader.SampleStream({ rate: 0.5, filter: /test/ });
+  var splitStream = split();
+  splitStream.pipe(sample);
+
+  sample.on('error', function(err) {
+    t.equal(err.message, 'Log line exceeds 1KB', 'throws correct error for oversized log line');
+    t.end();
+  });
+
+  // Create a line larger than 1KB
+  var bigLine = 'A'.repeat(1234) + '\n';
+  splitStream.write(bigLine);
+  splitStream.end();
+});

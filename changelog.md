@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 4.2.0
+- Adds `safe-regex2` to check for unsafe regexes in SampleStream filter input
+- Throws an error on lines bigger than 1KB to prevent potential resource exhaustion
+
 ## 4.1.0
 - Adds option to include given headers in requests
 
@@ -12,7 +16,7 @@ All notable changes to this project will be documented in this file. For change 
 - Use github actions for running tests
 
 ## 3.0.0 2022-08-11
-- Include request method in stream when generating a path. This will introduce a breaking change. More info in the [#55](https://github.com/mapbox/aws-log-replay/pull/55) PR description 
+- Include request method in stream when generating a path. This will introduce a breaking change. More info in the [#55](https://github.com/mapbox/aws-log-replay/pull/55) PR description
 - Request method will be used if passed to RequestStream. Only `GET` or `HEAD` requests are allowed to be replayed
 
 ## 2.6.1 2022-05-27

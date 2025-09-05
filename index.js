@@ -3,7 +3,7 @@ var url = require('url');
 var stream = require('stream');
 var crypto = require('crypto');
 var parallel = require('parallel-stream');
-const safeRegex = require('safe-regex');
+const safe = require('safe-regex2');
 
 module.exports = {};
 module.exports.RequestStream = RequestStream;
@@ -173,7 +173,7 @@ function SampleStream(options) {
   sampleStream.count = 0;
   sampleStream.threshold = Math.round(parseFloat(options.rate) * Math.pow(2, 16));
   if (options.filter) {
-    if (!safeRegex(options.filter)) throw new Error('Unsafe regex provided');
+    if (!safe(options.filter)) throw new Error('Unsafe regex provided');
     sampleStream.filterFunction = new RegExp(options.filter);
   }
   sampleStream._transform = function(line, enc, callback) {

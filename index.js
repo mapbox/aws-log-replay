@@ -101,7 +101,12 @@ function RequestStream(options) {
 
     pathname = data['path'];
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
-    if (!pathname || pathname.indexOf('/') !== 0) return callback();
+
+    // Validate pathname to prevent SSRF attacks
+    // 1. Must start with /
+    // 2. Must not start with // (protocol-relative URL like //attacker.com)
+    // 3. Must not contain :// (absolute URL like http://attacker.com)
+    if (!pathname || pathname.indexOf('/') !== 0 || pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1) return callback();
 
     var url = new URL(pathname, options.baseurl);
 

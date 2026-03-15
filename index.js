@@ -106,7 +106,13 @@ function RequestStream(options) {
     // 1. Must start with /
     // 2. Must not start with // (protocol-relative URL like //attacker.com)
     // 3. Must not contain :// (absolute URL like http://attacker.com)
-    if (!pathname || pathname.indexOf('/') !== 0 || pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1) return callback();
+    if (!pathname || pathname.indexOf('/') !== 0 || pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1) {
+      // Log potential SSRF attacks for security monitoring
+      if (pathname && (pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1)) {
+        console.error('[SECURITY] SSRF attempt blocked:', pathname);
+      }
+      return callback();
+    }
 
     var url = new URL(pathname, options.baseurl);
 

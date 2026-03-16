@@ -91,6 +91,10 @@ function RequestStream(options) {
   options = options || {};
   if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
   if (!options.hwm) options.hwm = 100;
+
+  // Parse baseurl once for SSRF validation
+  const baseurl = new URL(options.baseurl);
+
   function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
     var pathname, referer;
@@ -101,20 +105,23 @@ function RequestStream(options) {
 
     pathname = data['path'];
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
+    if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
     // Validate pathname to prevent SSRF attacks
-    // 1. Must start with /
-    // 2. Must not start with // (protocol-relative URL like //attacker.com)
-    // 3. Must not contain :// (absolute URL like http://attacker.com)
-    if (!pathname || pathname.indexOf('/') !== 0 || pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1) {
-      // Log potential SSRF attacks for security monitoring
-      if (pathname && (pathname.indexOf('//') === 0 || pathname.indexOf('://') !== -1)) {
-        console.error('[SECURITY] SSRF attempt blocked:', pathname);
-      }
+    // Construct the URL and verify it resolves to the same origin as baseurl
+    var url;
+    try {
+      url = new URL(pathname, baseurl);
+    } catch (e) {
+      // Invalid URL, skip
       return callback();
     }
 
-    var url = new URL(pathname, options.baseurl);
+    // SSRF protection: ensure the resolved URL has the same origin as baseurl
+    if (url.origin !== baseurl.origin) {
+      console.error('[SECURITY] SSRF attempt blocked - origin mismatch');
+      return callback();
+    }
 
     var gotOptions = {
       method: method || 'GET',

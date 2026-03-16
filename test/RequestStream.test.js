@@ -221,8 +221,8 @@ tape('RequestStream SSRF protection - valid relative paths still work', function
   });
 
   reqstream.on('finish', function() {
-    assert.equal(received, 3, 'received 3 valid responses');
-    assert.equal(count, 3, '3 requests were made for valid relative paths');
+    assert.equal(received, 4, 'received 4 valid responses');
+    assert.equal(count, 4, '4 requests were made for valid relative paths');
     assert.end();
   });
 
@@ -230,6 +230,8 @@ tape('RequestStream SSRF protection - valid relative paths still work', function
   reqstream.write({ path: '/api/v1/test' });
   reqstream.write({ path: '/path/to/resource?query=param' });
   reqstream.write({ path: '/another/valid/path' });
+  // Query param with URL should work (same origin)
+  reqstream.write({ path: '/api?next=https://example.com&foo=bar' });
   reqstream.end();
 });
 

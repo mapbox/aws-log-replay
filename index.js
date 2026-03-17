@@ -119,7 +119,6 @@ function RequestStream(options) {
 
     // SSRF protection: ensure the resolved URL has the same origin as baseurl
     if (url.origin !== baseurl.origin) {
-      console.error('[SECURITY] SSRF attempt blocked - origin mismatch');
       return callback();
     }
 

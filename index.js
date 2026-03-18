@@ -91,6 +91,10 @@ function RequestStream(options) {
   options = options || {};
   if (!options.baseurl) throw new Error('options.baseurl should be an http:// or https:// baseurl for replay requests');
   if (!options.hwm) options.hwm = 100;
+
+  // Parse baseurl once for SSRF validation
+  const baseurl = new URL(options.baseurl);
+
   function transform(data, enc, callback) {
     if (this._closed) return setImmediate(callback);
     var pathname, referer;
@@ -103,7 +107,20 @@ function RequestStream(options) {
     if (pathname && typeof pathname !== 'string') pathname = pathname.toString('utf8');
     if (!pathname || pathname.indexOf('/') !== 0) return callback();
 
-    var url = new URL(pathname, options.baseurl);
+    // Validate pathname to prevent SSRF attacks
+    // Construct the URL and verify it resolves to the same origin as baseurl
+    var url;
+    try {
+      url = new URL(pathname, baseurl);
+    } catch (e) {
+      // Invalid URL, skip
+      return callback();
+    }
+
+    // SSRF protection: ensure the resolved URL has the same origin as baseurl
+    if (url.origin !== baseurl.origin) {
+      return callback();
+    }
 
     var gotOptions = {
       method: method || 'GET',

@@ -163,6 +163,78 @@ tape('RequestStream close', function(assert) {
   reqstream.end();
 });
 
+tape('RequestStream SSRF protection - protocol-relative URLs', function(assert) {
+  server.reset();
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999'
+  });
+
+  reqstream.on('data', function() {
+    assert.fail('should not make any requests for protocol-relative URLs');
+  });
+
+  reqstream.on('finish', function() {
+    assert.equal(count, 0, 'no requests were made for protocol-relative URLs');
+    assert.end();
+  });
+
+  // These should all be rejected
+  reqstream.write({ path: '//attacker.com/exfil' });
+  reqstream.write({ path: '//evil.example.com/steal' });
+  reqstream.write({ path: '//169.254.169.254/latest/meta-data/iam/security-credentials/' });
+  reqstream.end();
+});
+
+tape('RequestStream SSRF protection - absolute URLs', function(assert) {
+  server.reset();
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999'
+  });
+
+  reqstream.on('data', function() {
+    assert.fail('should not make any requests for absolute URLs');
+  });
+
+  reqstream.on('finish', function() {
+    assert.equal(count, 0, 'no requests were made for absolute URLs');
+    assert.end();
+  });
+
+  // These should all be rejected
+  reqstream.write({ path: 'http://attacker.com/exfil' });
+  reqstream.write({ path: 'https://evil.example.com/steal' });
+  reqstream.write({ path: 'http://169.254.169.254/latest/meta-data/' });
+  reqstream.end();
+});
+
+tape('RequestStream SSRF protection - valid relative paths still work', function(assert) {
+  server.reset();
+  var reqstream = reader.RequestStream({
+    baseurl: 'http://localhost:9999'
+  });
+
+  var received = 0;
+  reqstream.on('data', function(d) {
+    received++;
+    assert.equal(d.statusCode, 200, 'valid relative paths still work');
+    assert.ok(/http:\/\/localhost:9999\//.test(d.url), 'URL is localhost as expected');
+  });
+
+  reqstream.on('finish', function() {
+    assert.equal(received, 4, 'received 4 valid responses');
+    assert.equal(count, 4, '4 requests were made for valid relative paths');
+    assert.end();
+  });
+
+  // These should all work normally
+  reqstream.write({ path: '/api/v1/test' });
+  reqstream.write({ path: '/path/to/resource?query=param' });
+  reqstream.write({ path: '/another/valid/path' });
+  // Query param with URL should work (same origin)
+  reqstream.write({ path: '/api?next=https://example.com&foo=bar' });
+  reqstream.end();
+});
+
 tape('teardown', function(assert) {
   server.close(assert.end);
 });

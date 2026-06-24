@@ -10,7 +10,7 @@
   "name": "@mapbox/aws-log-replay",
   "license": "BSD-2-Clause",
   "author": "Mapbox",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
     "got": "^11.8.6",
@@ -29,5 +29,8 @@
   },
   "main": "index.js",
   "readmeFilename": "README.md",
-  "description": "Transform and replay CloudFront, ELB Classic, and ALB logs."
+  "description": "Transform and replay CloudFront, ELB Classic, and ALB logs.",
+  "publishConfig": {
+    "access": "public"
+  }
 }

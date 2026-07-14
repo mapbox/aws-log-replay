@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## Unreleased
+- `RequestStream` merges optional per-request `data.headers` onto each replayed HTTP request (on top of `options.headers` / `referer`)
+
 ## 4.2.0
 - Adds `safe-regex2` to check for unsafe regexes in SampleStream filter input
 - Throws an error on lines bigger than 1KB to prevent potential resource exhaustion

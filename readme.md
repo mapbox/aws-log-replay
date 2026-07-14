@@ -20,6 +20,8 @@ Takes different types of logs as input and streams  an object to `stdout`. Forma
 ```
 Supported types include "cloudfront" for CloudFront logs and "lb" for ELB Classic or ALB logs.
 
+When feeding objects into `RequestStream` programmatically, you may also include a `headers` object for per-request HTTP headers (merged on top of `RequestStream({ headers })` static headers). Example: `{ path: '/a', method: 'GET', headers: { 'x-mapbox-request-id': '...' } }`.
+
 ```sh
 Usage: generatepath <type>
 ```

@@ -235,6 +235,55 @@ tape('RequestStream SSRF protection - valid relative paths still work', function
   reqstream.end();
 });
 
+tape('RequestStream per-request data.headers', function(assert) {
+  server.reset();
+  var seen = [];
+  var headerServer = http.createServer(function(req, res) {
+    seen.push({
+      url: req.url,
+      requestId: req.headers['x-mapbox-request-id'],
+      staticHeader: req.headers['x-static'],
+      referer: req.headers.referer
+    });
+    res.writeHead(200);
+    res.end('ok');
+  });
+
+  headerServer.listen(0, '127.0.0.1', function() {
+    var port = headerServer.address().port;
+    var reqstream = reader.RequestStream({
+      baseurl: 'http://127.0.0.1:' + port,
+      headers: { 'x-static': 'always' }
+    });
+
+    reqstream.on('data', function() {});
+    reqstream.on('finish', function() {
+      assert.equal(seen.length, 2);
+      assert.equal(seen[0].requestId, 'id-one');
+      assert.equal(seen[0].staticHeader, 'always');
+      assert.equal(seen[0].referer, 'https://example.com/');
+      assert.equal(seen[1].requestId, 'id-two');
+      assert.equal(seen[1].staticHeader, 'always');
+      // Per-request headers override static options.headers for the same key.
+      assert.equal(seen[1].referer, undefined);
+      headerServer.close(assert.end);
+    });
+
+    reqstream.write({
+      path: '/one',
+      method: 'GET',
+      referer: 'https://example.com/',
+      headers: { 'x-mapbox-request-id': 'id-one' }
+    });
+    reqstream.write({
+      path: '/two',
+      method: 'GET',
+      headers: { 'x-mapbox-request-id': 'id-two' }
+    });
+    reqstream.end();
+  });
+});
+
 tape('teardown', function(assert) {
   server.close(assert.end);
 });

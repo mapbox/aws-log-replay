@@ -85,7 +85,12 @@ function GeneratePath(type, keepReferer = false) {
  * @param {object} options
  * @param {string} options.baseurl - Required. An http or https url prepended to paths when making requests.
  * @param {string} options.strictSSL - Optional. If true (default), requires SSL/TLS certificates to be valid
- * @param {object} options.headers - Optional. Headers to applied to requests
+ * @param {object} options.headers - Optional. Headers applied to every request
+ *
+ * Each input object may include:
+ * - path (required), method, referer
+ * - headers (optional object): per-request headers merged on top of options.headers
+ *   (e.g. { 'x-mapbox-request-id': '...' } for wiretap Refresh/CA replay)
  */
 function RequestStream(options) {
   options = options || {};
@@ -142,13 +147,14 @@ function RequestStream(options) {
       }
     }
 
-    if (referer) {
-      gotOptions.headers = { referer };
+    var headers = {};
+    if (referer) headers.referer = referer;
+    if (options.headers) headers = { ...headers, ...options.headers };
+    // Per-request headers win over static options.headers for the same key.
+    if (data.headers && typeof data.headers === 'object') {
+      headers = { ...headers, ...data.headers };
     }
-
-    if(options.headers) {
-      gotOptions.headers = { ...gotOptions.headers, ...options.headers };
-    }
+    if (Object.keys(headers).length > 0) gotOptions.headers = headers;
 
     got(url, gotOptions)
       .then(({ statusCode, body, timings }) => {
